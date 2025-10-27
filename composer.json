@@ -1,0 +1,32 @@
+{
+	"name": "happyprime/theme-images-block",
+	"description": "A block for displaying theme images in WordPress.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"composer/installers": true,
+			"phpstan/extension-installer": true
+		},
+		"platform": {
+			"php": "7.4"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"HappyPrime\\ThemeImagesBlock\\": "src/"
+		}
+	},
+	"require-dev": {
+		"happyprime/coding-standards": "*",
+		"phpcompatibility/php-compatibility": "dev-develop as 9.99.99"
+	},
+	"scripts": {
+		"build": "composer install --no-dev --optimize-autoloader && wp dist-archive ./",
+		"phpcs": "vendor/bin/phpcs",
+		"phpcbf": "vendor/bin/phpcbf",
+		"phpstan": "vendor/bin/phpstan analyse --memory-limit=2048M",
+		"phpunit": "vendor/bin/phpunit"
+	}
+}
