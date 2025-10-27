@@ -2,10 +2,10 @@
 /**
  * Initialize the plugin.
  *
- * @package HappyPrime\ThemeImagesBlock
+ * @package HappyPrime\ThemeImageBlock
  */
 
-namespace HappyPrime\ThemeImagesBlock;
+namespace HappyPrime\ThemeImageBlock;
 
 /**
  * Initialize the plugin.

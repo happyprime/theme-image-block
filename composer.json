@@ -1,6 +1,6 @@
 {
-	"name": "happyprime/theme-images-block",
-	"description": "A block for displaying theme images in WordPress.",
+	"name": "happyprime/theme-image-block",
+	"description": "Use images from your theme as blocks in content.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"config": {
@@ -15,7 +15,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"HappyPrime\\ThemeImagesBlock\\": "src/"
+			"HappyPrime\\ThemeImageBlock\\": "src/"
 		}
 	},
 	"require-dev": {

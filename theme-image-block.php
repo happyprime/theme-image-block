@@ -15,10 +15,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * @package HappyPrime\ThemeImagesBlock
+ * @package HappyPrime\ThemeImageBlock
  */
 
-namespace HappyPrime\ThemeImagesBlock;
+namespace HappyPrime\ThemeImageBlock;
 
 const VERSION = '0.0.1';
 

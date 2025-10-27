@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file.
  *
- * @package HappyPrime\ThemeImagesBlock
+ * @package HappyPrime\ThemeImageBlock
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
