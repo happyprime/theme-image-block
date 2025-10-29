@@ -5,9 +5,9 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
 	entry: {
-		'theme-image-block/index': path.resolve(
+		'theme-image/index': path.resolve(
 			__dirname,
-			'blocks/src/theme-image-block',
+			'blocks/src/theme-image',
 			'index.js'
 		),
 	},

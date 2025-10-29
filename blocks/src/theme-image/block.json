@@ -1,0 +1,59 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "happyprime/theme-image",
+	"version": "0.1.0",
+	"title": "Theme Image",
+	"category": "media",
+	"icon": "format-image",
+	"description": "Display an image from the theme's images directory.",
+	"supports": {
+		"align": true,
+		"anchor": true,
+		"className": true,
+		"color": {
+			"text": true,
+			"background": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"attributes": {
+		"themeImage": {
+			"type": "string",
+			"default": ""
+		},
+		"alt": {
+			"type": "string",
+			"default": ""
+		},
+		"inlineSVG": {
+			"type": "boolean",
+			"default": false
+		},
+		"linkUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": ""
+		},
+		"linkRel": {
+			"type": "string",
+			"default": ""
+		},
+		"width": {
+			"type": "string",
+			"default": ""
+		},
+		"height": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"textdomain": "happyprime",
+	"editorScript": "file:../../build/theme-image/index.js"
+}

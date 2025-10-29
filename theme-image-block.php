@@ -45,6 +45,8 @@ const SLUG = 'theme-images-block';
  */
 const OPTION_NAME = 'hp_theme_images_block';
 
+const BLOCKS_DIR = __DIR__ . '/blocks';
+
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
