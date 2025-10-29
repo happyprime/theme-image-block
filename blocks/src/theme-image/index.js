@@ -15,8 +15,6 @@ import {
 	ToggleControl,
 	Button,
 	__experimentalUnitControl as UnitControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
