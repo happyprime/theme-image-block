@@ -37,7 +37,6 @@ class Registry {
 	 * @return bool True if registered successfully, false otherwise.
 	 */
 	public static function register( string $slug, array $args ): bool {
-		// Validate required fields.
 		if ( empty( $slug ) || empty( $args['title'] ) || empty( $args['path'] ) ) {
 			return false;
 		}
@@ -56,9 +55,13 @@ class Registry {
 			return false;
 		}
 
-		// Check if the image already exists.
 		// Sanitize the slug.
 		$slug = sanitize_key( $slug );
+
+		// This image is already registered.
+		if ( self::has( $slug ) ) {
+			return false;
+		}
 
 		// Set defaults for optional fields.
 		$defaults = array(
