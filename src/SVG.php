@@ -14,8 +14,8 @@ class SVG {
 	/**
 	 * Get an SVG.
 	 *
-	 * @param string $path The slug of the SVG to get.
-	 * @param array  $args The arguments for the SVG.
+	 * @param string                $path The slug of the SVG to get.
+	 * @param array<string, string> $args The arguments for the SVG.
 	 * @return string The SVG.
 	 */
 	public static function get( string $path, array $args = array() ): string {
@@ -63,6 +63,6 @@ class SVG {
 		// Remove XML declaration if present at the start of the SVG.
 		$svg = preg_replace( '/^<\?xml\s+.*?\?>\s*/s', '', $svg );
 
-		return $svg;
+		return $svg ?? '';
 	}
 }

@@ -14,7 +14,15 @@ class Registry {
 	/**
 	 * Registered theme images.
 	 *
-	 * @var array<string, array<string, mixed>>
+	 * @var array<string, array{
+	 *     title: string,
+	 *     description: string,
+	 *     alt: string,
+	 *     path: string,
+	 *     width: string,
+	 *     height: string,
+	 *     sizes: array<string, array{path: string, width: string, height: string}>
+	 * }>
 	 */
 	private static array $images = array();
 
@@ -93,7 +101,15 @@ class Registry {
 	/**
 	 * Get all registered images.
 	 *
-	 * @return array<string, array<string, mixed>> Registered images.
+	 * @return array<string, array{
+	 *     title: string,
+	 *     description: string,
+	 *     alt: string,
+	 *     path: string,
+	 *     width: string,
+	 *     height: string,
+	 *     sizes: array<string, array{path: string, width: string, height: string}>
+	 * }> Registered images, keyed by image slug.
 	 */
 	public static function get_all(): array {
 		return self::$images;
@@ -104,7 +120,15 @@ class Registry {
 	 *
 	 * @param string $slug Image slug.
 	 *
-	 * @return array<string, mixed>|null Image data or null if not found.
+	 * @return array{
+	 *     title: string,
+	 *     description: string,
+	 *     alt: string,
+	 *     path: string,
+	 *     width: string,
+	 *     height: string,
+	 *     sizes: array<string, array{path: string, width: string, height: string}>
+	 * }|null Image data or null if not found.
 	 */
 	public static function get( string $slug ): ?array {
 		$slug = sanitize_key( $slug );
@@ -172,7 +196,7 @@ class Registry {
 	 *
 	 * @param mixed $sizes Size variations.
 	 *
-	 * @return array<string, array<string, mixed>> Sanitized sizes.
+	 * @return array<string, array{path: string, width: string, height: string}> Sanitized sizes.
 	 */
 	private static function sanitize_sizes( $sizes ): array {
 		if ( ! is_array( $sizes ) ) {

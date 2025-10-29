@@ -14,8 +14,16 @@ class Block {
 	/**
 	 * Render the theme image block.
 	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content    Block content.
+	 * @param array<string, string> $attributes Block attributes. {
+	 *     @type string $themeImage The slug of the theme image to display. Required.
+	 *     @type bool   $inlineSVG  Whether to inline SVG content instead of using an img tag. Default false.
+	 *     @type string $linkUrl    URL for wrapping the image in a link. Default empty string.
+	 *     @type string $linkTarget Target attribute for the link (e.g., '_blank'). Default empty string.
+	 *     @type string $linkRel    Rel attribute for the link (e.g., 'nofollow'). Default empty string.
+	 *     @type string $width      CSS width value for the image. Default empty string.
+	 *     @type string $height     CSS height value for the image. Default empty string.
+	 * }
+	 * @param string               $content    Block content.
 	 *
 	 * @return string Rendered block HTML.
 	 */
