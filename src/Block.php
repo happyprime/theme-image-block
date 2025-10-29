@@ -13,6 +13,11 @@ namespace HappyPrime\ThemeImageBlock;
 class Block {
 	/**
 	 * Render the theme image block.
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content    Block content.
+	 *
+	 * @return string Rendered block HTML.
 	 */
 	public static function render( $attributes, $content ): string {
 		if ( empty( $attributes['themeImage'] ) ) {
