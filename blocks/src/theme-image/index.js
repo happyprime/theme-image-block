@@ -5,7 +5,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	BlockControls,
-	__experimentalImageURLInputUI as ImageURLInputUI,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { registerBlockType } from '@wordpress/blocks';
 import {
@@ -14,6 +14,8 @@ import {
 	TextControl,
 	ToggleControl,
 	Button,
+	ToolbarButton,
+	Popover,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -45,6 +47,7 @@ function Edit({ attributes, setAttributes }) {
 	const [isCustomWidth, setIsCustomWidth] = useState(false);
 	const [isCustomHeight, setIsCustomHeight] = useState(false);
 	const [svgContent, setSvgContent] = useState(null);
+	const [isEditingLink, setIsEditingLink] = useState(false);
 
 	// Check if width/height contains custom CSS functions
 	const hasCustomWidthCSS =
@@ -104,7 +107,7 @@ function Edit({ attributes, setAttributes }) {
 
 	// Get the image URL for preview
 	const imageUrl =
-		currentImage && currentImage.value
+		currentImage && currentImage.value && happyprimeData?.themeUrl
 			? `${happyprimeData.themeUrl}/${currentImage.value}`
 			: '';
 	const isSVG =
@@ -127,8 +130,7 @@ function Edit({ attributes, setAttributes }) {
 			<img
 				src={imageUrl}
 				alt={
-					currentImage?.alt ||
-					__('Theme image preview', 'happyprime')
+					currentImage?.alt || __('Theme image preview', 'happyprime')
 				}
 			/>
 		);
@@ -144,18 +146,85 @@ function Edit({ attributes, setAttributes }) {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<ImageURLInputUI
-					url={linkUrl}
-					onChangeUrl={(value) => setAttributes({ linkUrl: value })}
-					linkDestination={linkUrl ? 'custom' : undefined}
-					mediaUrl={imageUrl}
-					mediaLink={imageUrl}
-					linkTarget={linkTarget}
-					linkClass={linkRel}
-					rel={linkRel}
-				/>
-			</BlockControls>
+			{imageUrl && (
+				<BlockControls group="block">
+					<ToolbarButton
+						icon="admin-links"
+						label={__('Link', 'happyprime')}
+						onClick={() => setIsEditingLink(true)}
+						isActive={!!linkUrl}
+					/>
+					{linkUrl && (
+						<ToolbarButton
+							icon="editor-unlink"
+							label={__('Unlink', 'happyprime')}
+							onClick={() => {
+								setAttributes({
+									linkUrl: '',
+									linkTarget: '',
+									linkRel: '',
+								});
+							}}
+						/>
+					)}
+				</BlockControls>
+			)}
+
+			{isEditingLink && (
+				<Popover
+					position="bottom center"
+					onClose={() => setIsEditingLink(false)}
+					anchor={document.querySelector(
+						'.wp-block-happyprime-theme-image'
+					)}
+				>
+					<LinkControl
+						value={{
+							url: linkUrl,
+							opensInNewTab: linkTarget === '_blank',
+							nofollow: linkRel?.includes('nofollow'),
+						}}
+						onChange={(newLink) => {
+							// Build rel attribute from settings
+							const relParts = [];
+
+							if (newLink?.opensInNewTab) {
+								relParts.push('noopener', 'noreferrer');
+							}
+
+							if (newLink?.nofollow) {
+								relParts.push('nofollow');
+							}
+
+							setAttributes({
+								linkUrl: newLink?.url || '',
+								linkTarget: newLink?.opensInNewTab
+									? '_blank'
+									: '',
+								linkRel: relParts.join(' '),
+							});
+						}}
+						onRemove={() => {
+							setAttributes({
+								linkUrl: '',
+								linkTarget: '',
+								linkRel: '',
+							});
+							setIsEditingLink(false);
+						}}
+						settings={[
+							{
+								id: 'opensInNewTab',
+								title: __('Open in new tab', 'happyprime'),
+							},
+							{
+								id: 'nofollow',
+								title: __('Mark as nofollow', 'happyprime'),
+							},
+						]}
+					/>
+				</Popover>
+			)}
 
 			<InspectorControls>
 				<PanelBody
