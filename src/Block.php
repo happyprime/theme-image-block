@@ -42,8 +42,14 @@ class Block {
 		$height      = isset( $attributes['height'] ) && ! empty( $attributes['height'] ) ? esc_attr( $attributes['height'] ) : '';
 
 		// Construct the image path from the registered image data.
-		$image_path = get_template_directory() . '/' . $image_data['path'];
-		$image_url  = get_template_directory_uri() . '/' . $image_data['path'];
+		$image_path = realpath( get_template_directory() . '/' . $image_data['path'] );
+		$theme_dir  = realpath( get_template_directory() );
+
+		// Protect against path traversal, even though these images are all
+		// registered via PHP anyway.
+		if ( ! $image_path || ! $theme_dir || strpos( $image_path, $theme_dir ) !== 0 ) {
+			return '';
+		}
 
 		$is_svg = 'image/svg+xml' === mime_content_type( $image_path );
 
@@ -128,7 +134,7 @@ class Block {
 		$img_style = ! empty( $inline_styles ) ? sprintf( ' style="%s"', implode( '; ', $inline_styles ) ) : '';
 		$img       = sprintf(
 			'<img src="%s" alt="%s"%s />',
-			esc_url( $image_url ),
+			esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
 			$alt,
 			$img_style
 		);

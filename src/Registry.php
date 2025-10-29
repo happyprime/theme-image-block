@@ -42,6 +42,21 @@ class Registry {
 			return false;
 		}
 
+		$full_path = realpath( get_template_directory() . '/' . $args['path'] );
+		$theme_dir = realpath( get_template_directory() );
+
+		// Protect against path traversal, even though these images are all
+		// registered via PHP anyway.
+		if ( ! $full_path || ! $theme_dir || strpos( $full_path, $theme_dir ) !== 0 ) {
+			return false;
+		}
+
+		// Only allow images that exist to be registered.
+		if ( ! file_exists( $full_path ) ) {
+			return false;
+		}
+
+		// Check if the image already exists.
 		// Sanitize the slug.
 		$slug = sanitize_key( $slug );
 
