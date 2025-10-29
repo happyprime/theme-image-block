@@ -42,7 +42,7 @@ class Block {
 			);
 		}
 
-		$alt         = isset( $attributes['alt'] ) ? esc_attr( $attributes['alt'] ) : esc_attr( $image_data['alt'] );
+		$alt         = esc_attr( $image_data['alt'] );
 		$inline_svg  = isset( $attributes['inlineSVG'] ) && $attributes['inlineSVG'];
 		$link_url    = isset( $attributes['linkUrl'] ) ? esc_url( $attributes['linkUrl'] ) : '';
 		$link_target = isset( $attributes['linkTarget'] ) ? esc_attr( $attributes['linkTarget'] ) : '';

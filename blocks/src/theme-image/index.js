@@ -35,7 +35,6 @@ import metadata from './block.json';
 function Edit({ attributes, setAttributes }) {
 	const {
 		themeImage,
-		alt,
 		inlineSVG,
 		linkUrl,
 		linkTarget,
@@ -127,7 +126,10 @@ function Edit({ attributes, setAttributes }) {
 		imagePreview = (
 			<img
 				src={imageUrl}
-				alt={alt || __('Theme image preview', 'happyprime')}
+				alt={
+					currentImage?.alt ||
+					__('Theme image preview', 'happyprime')
+				}
 			/>
 		);
 	}
@@ -169,16 +171,6 @@ function Edit({ attributes, setAttributes }) {
 						}
 						help={__(
 							'Select an image from the theme directory.',
-							'happyprime'
-						)}
-					/>
-
-					<TextControl
-						label={__('Alt Text', 'happyprime')}
-						value={alt}
-						onChange={(value) => setAttributes({ alt: value })}
-						help={__(
-							'Describe the image for screen readers.',
 							'happyprime'
 						)}
 					/>

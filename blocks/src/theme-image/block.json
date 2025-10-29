@@ -25,10 +25,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"alt": {
-			"type": "string",
-			"default": ""
-		},
 		"inlineSVG": {
 			"type": "boolean",
 			"default": false
