@@ -90,8 +90,15 @@ function Edit({ attributes, setAttributes }) {
 			const imageUrl = `${happyprimeData.themeUrl}/${currentImage.value}`;
 			fetch(imageUrl)
 				.then((response) => response.text())
-				.then((svg) => setSvgContent(svg))
-				.catch(() => setSvgContent(null));
+				.then((svg) => {
+					// Remove XML declaration to match server-side processing
+					const cleanedSvg = svg.replace(/^<\?xml\s+.*?\?>\s*/s, '');
+					setSvgContent(cleanedSvg);
+				})
+				.catch((error) => {
+					console.error('Failed to fetch SVG:', error);
+					setSvgContent(null);
+				});
 		} else {
 			setSvgContent(null);
 		}
@@ -100,8 +107,10 @@ function Edit({ attributes, setAttributes }) {
 	const blockProps = useBlockProps({
 		className: inlineSVG ? 'has-inline-svg' : '',
 		style: {
-			...(width && { width }),
-			...(height && { height }),
+			// Only apply width/height to wrapper for non-inline SVGs
+			// For inline SVGs, dimensions are applied directly to the SVG element
+			...(!inlineSVG && width && { width }),
+			...(!inlineSVG && height && { height }),
 		},
 	});
 
@@ -115,18 +124,76 @@ function Edit({ attributes, setAttributes }) {
 		currentImage.value &&
 		currentImage.value.toLowerCase().endsWith('.svg');
 
-	// Render inline SVG or regular image
-	let imagePreview;
+	// Process inline SVG if needed
+	let processedSvg = null;
+	if (inlineSVG && svgContent) {
+		// Build styles array - use defaults if not specified for editor preview
+		const styles = [];
+		if (width) {
+			styles.push(`width: ${width}`);
+		} else {
+			// Default width for editor preview when not specified
+			styles.push('width: 100%');
+		}
+		if (height) {
+			styles.push(`height: ${height}`);
+		}
+
+		const styleAttr = styles.join('; ');
+
+		// Insert or merge style attribute into the SVG tag
+		const svgMatch = svgContent.match(/<svg([^>]*)>/);
+		if (svgMatch) {
+			const existingAttrs = svgMatch[1];
+			const styleMatch = existingAttrs.match(/style="([^"]*)"/);
+
+			if (styleMatch) {
+				// Merge with existing style
+				const existingStyle = styleMatch[1];
+				processedSvg = svgContent.replace(
+					/<svg([^>]*)>/,
+					(match) => match.replace(
+						/style="[^"]*"/,
+						`style="${existingStyle}; ${styleAttr}"`
+					)
+				);
+			} else {
+				// Add new style attribute
+				processedSvg = svgContent.replace(
+					/<svg([^>]*)>/,
+					`<svg$1 style="${styleAttr}">`
+				);
+			}
+		}
+	}
+
+	// Build content based on image type and link settings
+	// Structure matches server-side: <div><a?><svg|img></a?></div>
+	let content;
 	if (!imageUrl) {
-		imagePreview = (
+		content = (
 			<div className="theme-image-placeholder">
 				{__('Select a theme image from the sidebar', 'happyprime')}
 			</div>
 		);
-	} else if (inlineSVG && svgContent) {
-		imagePreview = <div dangerouslySetInnerHTML={{ __html: svgContent }} />;
+	} else if (inlineSVG && processedSvg) {
+		// For inline SVG, apply dangerouslySetInnerHTML to link or wrapper
+		// to match server-side structure without extra div wrapper
+		if (linkUrl) {
+			content = (
+				<a
+					href={linkUrl}
+					target={linkTarget}
+					rel={linkRel}
+					dangerouslySetInnerHTML={{ __html: processedSvg }}
+				/>
+			);
+		} else {
+			// Will be applied to wrapper div via blockProps below
+			content = null;
+		}
 	} else {
-		imagePreview = (
+		const img = (
 			<img
 				src={imageUrl}
 				alt={
@@ -134,15 +201,20 @@ function Edit({ attributes, setAttributes }) {
 				}
 			/>
 		);
+		content = linkUrl ? (
+			<a href={linkUrl} target={linkTarget} rel={linkRel}>
+				{img}
+			</a>
+		) : (
+			img
+		);
 	}
 
-	const content = linkUrl ? (
-		<a href={linkUrl} target={linkTarget} rel={linkRel}>
-			{imagePreview}
-		</a>
-	) : (
-		imagePreview
-	);
+	// For inline SVG without link, apply HTML directly to wrapper
+	const wrapperProps =
+		inlineSVG && processedSvg && !linkUrl
+			? { ...blockProps, dangerouslySetInnerHTML: { __html: processedSvg } }
+			: blockProps;
 
 	return (
 		<>
@@ -386,7 +458,7 @@ function Edit({ attributes, setAttributes }) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div {...blockProps}>{content}</div>
+			<div {...wrapperProps}>{content}</div>
 		</>
 	);
 }
