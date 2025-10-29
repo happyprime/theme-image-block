@@ -54,4 +54,31 @@ if ( ! defined( 'WPINC' ) ) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+/**
+ * Register a theme image.
+ *
+ * This function can be used by themes and plugins to register images that
+ * should be available for selection in the Theme Image block.
+ *
+ * @since 0.1.0
+ *
+ * @param string               $slug Unique identifier for the image.
+ * @param array<string, mixed> $args {
+ *     Image configuration arguments.
+ *
+ *     @type string $title       Display title for the image (required).
+ *     @type string $description Description of the image (optional).
+ *     @type string $alt         Default alt text for the image (optional).
+ *     @type string $path        Path to the image file relative to the theme directory (required).
+ *     @type string $width       Default width value (optional).
+ *     @type string $height      Default height value (optional).
+ *     @type array  $sizes       Array of size variations (optional).
+ * }
+ *
+ * @return bool True if registered successfully, false otherwise.
+ */
+function register_theme_image( string $slug, array $args ): bool {
+	return \HappyPrime\ThemeImageBlock\Registry::register( $slug, $args );
+}
+
 add_action( 'plugins_loaded', [ Init::class, 'init' ] );

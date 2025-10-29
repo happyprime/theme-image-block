@@ -24,8 +24,25 @@ class Block {
 			return '';
 		}
 
-		$theme_image = sanitize_file_name( $attributes['themeImage'] );
-		$alt         = isset( $attributes['alt'] ) ? esc_attr( $attributes['alt'] ) : '';
+		// Get the image slug and look up the registered image data.
+		$image_slug = sanitize_key( $attributes['themeImage'] );
+		$image_data = Registry::get( $image_slug );
+
+		// If the image isn't registered, return an error message.
+		if ( ! $image_data ) {
+			$wrapper_attrs = array();
+			return sprintf(
+				'<div %s><p>%s</p></div>',
+				get_block_wrapper_attributes( $wrapper_attrs ),
+				sprintf(
+					/* translators: %s: image slug */
+					esc_html__( 'Theme image "%s" is not registered.', 'happyprime' ),
+					esc_html( $image_slug )
+				)
+			);
+		}
+
+		$alt         = isset( $attributes['alt'] ) ? esc_attr( $attributes['alt'] ) : esc_attr( $image_data['alt'] );
 		$inline_svg  = isset( $attributes['inlineSVG'] ) && $attributes['inlineSVG'];
 		$link_url    = isset( $attributes['linkUrl'] ) ? esc_url( $attributes['linkUrl'] ) : '';
 		$link_target = isset( $attributes['linkTarget'] ) ? esc_attr( $attributes['linkTarget'] ) : '';
@@ -33,9 +50,9 @@ class Block {
 		$width       = isset( $attributes['width'] ) && ! empty( $attributes['width'] ) ? esc_attr( $attributes['width'] ) : '';
 		$height      = isset( $attributes['height'] ) && ! empty( $attributes['height'] ) ? esc_attr( $attributes['height'] ) : '';
 
-		// Construct the image path.
-		$image_path = get_template_directory() . '/images/' . $theme_image;
-		$image_url  = get_template_directory_uri() . '/images/' . $theme_image;
+		// Construct the image path from the registered image data.
+		$image_path = get_template_directory() . '/' . $image_data['path'];
+		$image_url  = get_template_directory_uri() . '/' . $image_data['path'];
 
 		// Check if file exists.
 		if ( ! file_exists( $image_path ) ) {

@@ -61,14 +61,31 @@ function Edit({ attributes, setAttributes }) {
 			height.includes('min') ||
 			height.includes('max'));
 
+	// Get registered theme images from localized data
+	const registeredImages = happyprimeData?.images || [];
+
+	// Build the options array for the SelectControl
+	const themeImages = [
+		{ value: '', label: __('Select an image', 'happyprime') },
+		...registeredImages.map((image) => ({
+			value: image.slug,
+			label: image.label,
+		})),
+	];
+
+	// Find the currently selected image data
+	const currentImage = registeredImages.find(
+		(img) => img.slug === themeImage
+	);
+
 	// Fetch SVG content when inline SVG is enabled
 	useEffect(() => {
 		if (
 			inlineSVG &&
-			themeImage &&
-			themeImage.toLowerCase().endsWith('.svg')
+			currentImage &&
+			currentImage.value.toLowerCase().endsWith('.svg')
 		) {
-			const imageUrl = `${happyprimeData.themeUrl}/images/${themeImage}`;
+			const imageUrl = `${happyprimeData.themeUrl}/${currentImage.value}`;
 			fetch(imageUrl)
 				.then((response) => response.text())
 				.then((svg) => setSvgContent(svg))
@@ -76,28 +93,7 @@ function Edit({ attributes, setAttributes }) {
 		} else {
 			setSvgContent(null);
 		}
-	}, [inlineSVG, themeImage]);
-
-	// Available theme images - this list should match what's in the theme/images directory
-	const themeImages = [
-		{ value: '', label: __('Select an image', 'happyprime') },
-		{
-			value: 'happy-prime-logo.svg',
-			label: __('Happy Prime Logo', 'happyprime'),
-		},
-		{
-			value: 'happy-prime-mark.svg',
-			label: __('Happy Prime Mark', 'happyprime'),
-		},
-		{
-			value: 'happy-prime-wordmark.svg',
-			label: __('Happy Prime Wordmark', 'happyprime'),
-		},
-		{
-			value: 'icon-arrow-right.svg',
-			label: __('Arrow Right Icon', 'happyprime'),
-		},
-	];
+	}, [inlineSVG, currentImage]);
 
 	const blockProps = useBlockProps({
 		className: inlineSVG ? 'has-inline-svg' : '',
@@ -108,10 +104,14 @@ function Edit({ attributes, setAttributes }) {
 	});
 
 	// Get the image URL for preview
-	const imageUrl = themeImage
-		? `${happyprimeData.themeUrl}/images/${themeImage}`
-		: '';
-	const isSVG = themeImage && themeImage.toLowerCase().endsWith('.svg');
+	const imageUrl =
+		currentImage && currentImage.value
+			? `${happyprimeData.themeUrl}/${currentImage.value}`
+			: '';
+	const isSVG =
+		currentImage &&
+		currentImage.value &&
+		currentImage.value.toLowerCase().endsWith('.svg');
 
 	// Render inline SVG or regular image
 	let imagePreview;
