@@ -59,8 +59,9 @@ class SVG {
 		}
 
 		$svg = $processor->get_updated_html();
-		// Remove XML declaration if present.
-		$svg = preg_replace( '/<\?xml.*?\?>/', '', $svg );
+
+		// Remove XML declaration if present at the start of the SVG.
+		$svg = preg_replace( '/^<\?xml\s+.*?\?>\s*/s', '', $svg );
 
 		return $svg;
 	}
