@@ -51,114 +51,59 @@ class Block {
 			return '';
 		}
 
+		$inline_styles = array();
+		if ( $width ) {
+			$inline_styles[] = 'width: ' . $width;
+		}
+		if ( $height ) {
+			$inline_styles[] = 'height: ' . $height;
+		}
+
+		$wrapper_classes = array();
+
 		$is_svg = 'image/svg+xml' === mime_content_type( $image_path );
 
-		// Handle inline SVG.
 		if ( $inline_svg && $is_svg ) {
-			$svg = file_get_contents( $image_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-
-			if ( ! $svg ) {
-				return '';
-			}
-
-			// Process SVG to add accessibility attributes.
-			$processor = new \WP_HTML_Tag_Processor( $svg );
-
-			if ( $processor->next_tag( 'svg' ) ) {
-				if ( $alt ) {
-					$processor->set_attribute( 'aria-label', $alt );
-					$processor->set_attribute( 'role', 'img' );
-				} else {
-					$processor->set_attribute( 'aria-hidden', 'true' );
-				}
-
-				$processor->set_attribute( 'focusable', 'false' );
-
-				// Apply width/height to SVG if set.
-				$inline_styles = array();
-				if ( $width ) {
-					$inline_styles[] = 'width: ' . $width;
-				}
-				if ( $height ) {
-					$inline_styles[] = 'height: ' . $height;
-				}
-				if ( ! empty( $inline_styles ) ) {
-					$processor->set_attribute( 'style', implode( '; ', $inline_styles ) );
-				}
-			}
-
-			$svg = $processor->get_updated_html();
-			// Remove XML declaration if present.
-			$svg = preg_replace( '/<\?xml.*?\?>/', '', $svg );
-
-			// Wrap in link if URL is provided.
-			if ( $link_url ) {
-				$link_attrs  = sprintf( ' href="%s"', $link_url );
-				$link_attrs .= $link_target ? sprintf( ' target="%s"', $link_target ) : '';
-				$link_attrs .= $link_rel ? sprintf( ' rel="%s"', $link_rel ) : '';
-
-				$content = sprintf( '<a%s>%s</a>', $link_attrs, $svg );
-			} else {
-				$content = $svg;
-			}
-
-			$wrapper_class = 'has-inline-svg';
-			$wrapper_attrs = array( 'class' => $wrapper_class );
-
-			$inline_styles = array();
-			if ( $width ) {
-				$inline_styles[] = 'width: ' . $width;
-			}
-			if ( $height ) {
-				$inline_styles[] = 'height: ' . $height;
-			}
-			if ( ! empty( $inline_styles ) ) {
-				$wrapper_attrs['style'] = implode( '; ', $inline_styles );
-			}
-
-			return sprintf(
-				'<div %s>%s</div>',
-				get_block_wrapper_attributes( $wrapper_attrs ),
-				$content
+			$wrapper_classes[] = 'has-inline-svg';
+			$content           = SVG::get(
+				$image_path,
+				[
+					'alt'    => $alt,
+					'width'  => $width,
+					'height' => $height,
+				]
+			);
+		} else {
+			$content = sprintf(
+				'<img src="%s" alt="%s" />',
+				esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
+				$alt,
 			);
 		}
 
-		// Standard image tag rendering.
-		$inline_styles = array();
-		if ( $width ) {
-			$inline_styles[] = 'width: ' . $width;
-		}
-		if ( $height ) {
-			$inline_styles[] = 'height: ' . $height;
-		}
-		$img_style = ! empty( $inline_styles ) ? sprintf( ' style="%s"', implode( '; ', $inline_styles ) ) : '';
-		$img       = sprintf(
-			'<img src="%s" alt="%s"%s />',
-			esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
-			$alt,
-			$img_style
-		);
-
-		// Wrap in link if URL is provided.
 		if ( $link_url ) {
-			$link_attrs  = sprintf( ' href="%s"', $link_url );
-			$link_attrs .= $link_target ? sprintf( ' target="%s"', $link_target ) : '';
-			$link_attrs .= $link_rel ? sprintf( ' rel="%s"', $link_rel ) : '';
-
-			$content = sprintf( '<a%s>%s</a>', $link_attrs, $img );
-		} else {
-			$content = $img;
+			$content = '<a>' . $content . '</a>';
 		}
 
-		$wrapper_attrs = array();
+		$html = new \WP_HTML_Tag_Processor( $content );
+		if ( $html->next_tag( array( 'tag_name' => 'a' ) ) ) {
+			$html->set_attribute( 'href', $link_url );
+			if ( $link_target ) {
+				$html->set_attribute( 'target', $link_target );
+			}
+			if ( $link_rel ) {
+				$html->set_attribute( 'rel', $link_rel );
+			}
+		}
 
-		$inline_styles = array();
-		if ( $width ) {
-			$inline_styles[] = 'width: ' . $width;
+		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) && ! empty( $inline_styles ) ) {
+			$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
 		}
-		if ( $height ) {
-			$inline_styles[] = 'height: ' . $height;
-		}
+
+		$content = $html->get_updated_html();
+
+		$wrapper_attrs = array( 'class' => implode( ' ', $wrapper_classes ) );
+
 		if ( ! empty( $inline_styles ) ) {
 			$wrapper_attrs['style'] = implode( '; ', $inline_styles );
 		}
