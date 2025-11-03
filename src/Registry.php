@@ -21,7 +21,8 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
-	 *     sizes: array<string, array{path: string, width: string, height: string}>
+	 *     variations: array<string, array{path: string, width: string, height: string}>,
+	 *     sizes: string
 	 * }>
 	 */
 	private static array $images = array();
@@ -39,7 +40,8 @@ class Registry {
 	 *     @type string $path        Path to the image file relative to the theme directory (required).
 	 *     @type string $width       Default width value (optional).
 	 *     @type string $height      Default height value (optional).
-	 *     @type array  $sizes       Array of size variations (optional).
+	 *     @type array  $variations  Array of image variations for srcset (optional).
+	 *     @type string $sizes       Value for the sizes attribute (optional).
 	 * }
 	 *
 	 * @return bool True if registered successfully, false otherwise.
@@ -79,7 +81,8 @@ class Registry {
 			'path'        => '',
 			'width'       => '',
 			'height'      => '',
-			'sizes'       => array(),
+			'variations'  => array(),
+			'sizes'       => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -92,7 +95,8 @@ class Registry {
 			'path'        => sanitize_text_field( $args['path'] ),
 			'width'       => sanitize_text_field( $args['width'] ),
 			'height'      => sanitize_text_field( $args['height'] ),
-			'sizes'       => self::sanitize_sizes( $args['sizes'] ),
+			'variations'  => self::sanitize_variations( $args['variations'] ),
+			'sizes'       => sanitize_text_field( $args['sizes'] ),
 		);
 
 		return true;
@@ -108,7 +112,8 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
-	 *     sizes: array<string, array{path: string, width: string, height: string}>
+	 *     variations: array<string, array{path: string, width: string, height: string}>,
+	 *     sizes: string
 	 * }> Registered images, keyed by image slug.
 	 */
 	public static function get_all(): array {
@@ -127,7 +132,8 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
-	 *     sizes: array<string, array{path: string, width: string, height: string}>
+	 *     variations: array<string, array{path: string, width: string, height: string}>,
+	 *     sizes: string
 	 * }|null Image data or null if not found.
 	 */
 	public static function get( string $slug ): ?array {
@@ -184,6 +190,7 @@ class Registry {
 				'alt'         => $data['alt'],
 				'width'       => $data['width'],
 				'height'      => $data['height'],
+				'variations'  => $data['variations'],
 				'sizes'       => $data['sizes'],
 			);
 		}
@@ -192,20 +199,20 @@ class Registry {
 	}
 
 	/**
-	 * Sanitize size variations.
+	 * Sanitize image variations.
 	 *
-	 * @param mixed $sizes Size variations.
+	 * @param mixed $variations Image variations.
 	 *
-	 * @return array<string, array{path: string, width: string, height: string}> Sanitized sizes.
+	 * @return array<string, array{path: string, width: string, height: string}> Sanitized variations.
 	 */
-	private static function sanitize_sizes( $sizes ): array {
-		if ( ! is_array( $sizes ) ) {
+	private static function sanitize_variations( $variations ): array {
+		if ( ! is_array( $variations ) ) {
 			return array();
 		}
 
 		$sanitized = array();
 
-		foreach ( $sizes as $size => $data ) {
+		foreach ( $variations as $size => $data ) {
 			if ( ! is_array( $data ) ) {
 				continue;
 			}

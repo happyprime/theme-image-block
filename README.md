@@ -26,25 +26,26 @@ HappyPrime\ThemeImageBlock\register_theme_image(
 		'description' => 'The Happy Prime logo.',
 		'alt' => 'Happy Prime',
 		'path' => 'images/happy-prime-logo.svg',
-		'width' => '',
+		'width' => '300',
 		'height' => '',
-		'sizes' => [
+		'variations' => [
 			'small' => [
 				'path'   => 'images/happy-prime-logo-small.svg',
-				'width'  => 100,
-				'height' => 100,
+				'width'  => '100',
+				'height' => '100',
 			],
 			'medium' => [
 				'path'   => 'images/happy-prime-logo-medium.svg',
-				'width'  => 200,
-				'height' => 200,
+				'width'  => '200',
+				'height' => '200',
 			],
 			'large' => [
 				'path'   => 'images/happy-prime-logo-large.svg',
-				'width'  => 300,
-				'height' => 300,
+				'width'  => '300',
+				'height' => '300',
 			],
 		],
+		'sizes' => '(max-width: 600px) 100vw, 300px',
 	]
 );
 ```
@@ -63,9 +64,10 @@ Registers a theme image for use in the Theme Image block.
   - `description` (string, optional): Description of the image.
   - `alt` (string, optional): Default alt text for accessibility.
   - `path` (string, required): Path to the image file relative to the theme directory.
-  - `width` (string, optional): Default width value.
-  - `height` (string, optional): Default height value.
-  - `sizes` (array, optional): Array of size variations.
+  - `width` (string, optional): Width of the main image in pixels. Used to build the srcset attribute.
+  - `height` (string, optional): Height of the main image in pixels.
+  - `variations` (array, optional): Array of image variations with different sizes. Each variation should include `path`, `width`, and `height`. Used to build the srcset attribute.
+  - `sizes` (string, optional): Value for the HTML sizes attribute. Controls which image size the browser selects from srcset based on layout. Example: `(max-width: 600px) 100vw, 300px`.
 
 **Returns:** Boolean indicating success.
 
@@ -83,7 +85,9 @@ Registers a theme image for use in the Theme Image block.
 ## Features
 
 - **PHP-based registration**: Register images from your theme or plugin code
-- **Rich metadata**: Include titles, descriptions, alt text, and size variations
+- **Rich metadata**: Include titles, descriptions, alt text, and image variations
+- **Responsive images**: Automatic srcset generation from registered variations for optimal image loading
+- **Custom sizes attribute**: Define custom sizes strings to control responsive image selection
 - **Flexible dimensions**: Support for all CSS units and functions (px, %, rem, clamp, calc, etc.)
 - **Inline SVG support**: Render SVG files inline for better styling control
 - **Link support**: Add links to images with target and rel options
