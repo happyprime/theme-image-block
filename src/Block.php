@@ -60,27 +60,42 @@ class Block {
 			$display_path = $image_data['variations'][ $image_size ]['path'];
 		}
 
+		// Determine the maximum width for srcset based on selected size.
+		$max_width = null;
+		if (
+			'original' !== $image_size &&
+			! empty( $image_data['variations'][ $image_size ]['width'] )
+		) {
+			$max_width = (int) $image_data['variations'][ $image_size ]['width'];
+		}
+
 		// Build srcset from registered variations.
 		$srcset_parts = array();
 
-		// Add the main image if it has a width.
+		// Add the main image if it has a width and is within the size limit.
 		if ( ! empty( $image_data['width'] ) ) {
-			$srcset_parts[] = sprintf(
-				'%s %sw',
-				esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
-				(int) $image_data['width']
-			);
+			$original_width = (int) $image_data['width'];
+			if ( null === $max_width || $original_width <= $max_width ) {
+				$srcset_parts[] = sprintf(
+					'%s %sw',
+					esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
+					$original_width
+				);
+			}
 		}
 
-		// Add variations if they have width and path.
+		// Add variations if they have width and path and are within the size limit.
 		if ( ! empty( $image_data['variations'] ) && is_array( $image_data['variations'] ) ) {
 			foreach ( $image_data['variations'] as $variation ) {
 				if ( ! empty( $variation['width'] ) && ! empty( $variation['path'] ) ) {
-					$srcset_parts[] = sprintf(
-						'%s %sw',
-						esc_url( get_template_directory_uri() . '/' . $variation['path'] ),
-						(int) $variation['width']
-					);
+					$variation_width = (int) $variation['width'];
+					if ( null === $max_width || $variation_width <= $max_width ) {
+						$srcset_parts[] = sprintf(
+							'%s %sw',
+							esc_url( get_template_directory_uri() . '/' . $variation['path'] ),
+							$variation_width
+						);
+					}
 				}
 			}
 		}
