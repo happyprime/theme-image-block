@@ -1,3 +1,4 @@
 node_modules
 vendor
 .claude
+.phpunit.result.cache
