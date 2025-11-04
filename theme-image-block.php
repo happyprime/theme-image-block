@@ -72,7 +72,8 @@ require_once __DIR__ . '/vendor/autoload.php';
  *     @type string $path        Path to the image file relative to the theme directory (required).
  *     @type string $width       Default width value (optional).
  *     @type string $height      Default height value (optional).
- *     @type array  $sizes       Array of size variations (optional).
+ *     @type array  $variations  Array of image variations for srcset (optional).
+ *     @type string $sizes       Value for the sizes attribute (optional).
  * }
  *
  * @return bool True if registered successfully, false otherwise.

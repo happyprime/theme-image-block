@@ -49,6 +49,34 @@ class Block {
 		$width       = isset( $attributes['width'] ) && ! empty( $attributes['width'] ) ? esc_attr( $attributes['width'] ) : '';
 		$height      = isset( $attributes['height'] ) && ! empty( $attributes['height'] ) ? esc_attr( $attributes['height'] ) : '';
 
+		// Build srcset from registered variations.
+		$srcset_parts = array();
+
+		// Add the main image if it has a width.
+		if ( ! empty( $image_data['width'] ) ) {
+			$srcset_parts[] = sprintf(
+				'%s %sw',
+				esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
+				(int) $image_data['width']
+			);
+		}
+
+		// Add variations if they have width and path.
+		if ( ! empty( $image_data['variations'] ) && is_array( $image_data['variations'] ) ) {
+			foreach ( $image_data['variations'] as $variation ) {
+				if ( ! empty( $variation['width'] ) && ! empty( $variation['path'] ) ) {
+					$srcset_parts[] = sprintf(
+						'%s %sw',
+						esc_url( get_template_directory_uri() . '/' . $variation['path'] ),
+						(int) $variation['width']
+					);
+				}
+			}
+		}
+
+		$srcset = ! empty( $srcset_parts ) ? implode( ', ', $srcset_parts ) : '';
+		$sizes  = ! empty( $image_data['sizes'] ) ? esc_attr( $image_data['sizes'] ) : '';
+
 		// Construct the image path from the registered image data.
 		$image_path = realpath( get_template_directory() . '/' . $image_data['path'] );
 		$theme_dir  = realpath( get_template_directory() );
@@ -104,8 +132,19 @@ class Block {
 			}
 		}
 
-		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) && ! empty( $inline_styles ) ) {
-			$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
+		// This seems to be the best way to rewind and seek again? Seems strange.
+		$html = new \WP_HTML_Tag_Processor( $html->get_updated_html() );
+
+		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) ) {
+			if ( ! empty( $inline_styles ) ) {
+				$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
+			}
+			if ( ! empty( $srcset ) ) {
+				$html->set_attribute( 'srcset', $srcset );
+			}
+			if ( ! empty( $sizes ) ) {
+				$html->set_attribute( 'sizes', $sizes );
+			}
 		}
 
 		$content = $html->get_updated_html();
