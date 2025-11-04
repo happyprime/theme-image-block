@@ -8,16 +8,13 @@
 	"icon": "format-image",
 	"description": "Display an image from the theme's images directory.",
 	"supports": {
-		"align": true,
 		"anchor": true,
-		"className": true,
 		"color": {
-			"text": true,
-			"background": true
+			"text": false,
+			"background": false
 		},
 		"spacing": {
-			"margin": true,
-			"padding": true
+			"margin": true
 		}
 	},
 	"attributes": {
