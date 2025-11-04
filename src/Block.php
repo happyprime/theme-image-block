@@ -177,10 +177,6 @@ class Block {
 
 		$wrapper_attrs = array( 'class' => implode( ' ', $wrapper_classes ) );
 
-		if ( ! empty( $inline_styles ) ) {
-			$wrapper_attrs['style'] = implode( '; ', $inline_styles );
-		}
-
 		return sprintf(
 			'<div %s>%s</div>',
 			get_block_wrapper_attributes( $wrapper_attrs ),
