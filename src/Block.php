@@ -132,6 +132,9 @@ class Block {
 			}
 		}
 
+		// This seems to be the best way to rewind and seek again? Seems strange.
+		$html = new \WP_HTML_Tag_Processor( $html->get_updated_html() );
+
 		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) ) {
 			if ( ! empty( $inline_styles ) ) {
 				$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
