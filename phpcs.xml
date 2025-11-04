@@ -4,5 +4,6 @@
 	<rule ref="vendor/happyprime/coding-standards/HappyPrime">
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+		<exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop" />
 	</rule>
 </ruleset>

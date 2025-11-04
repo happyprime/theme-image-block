@@ -23,7 +23,7 @@ class Block {
 	 *     @type string $width      CSS width value for the image. Default empty string.
 	 *     @type string $height     CSS height value for the image. Default empty string.
 	 * }
-	 * @param string               $content    Block content.
+	 * @param string                $content    Block content.
 	 *
 	 * @return string Rendered block HTML.
 	 */
