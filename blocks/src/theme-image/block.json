@@ -25,6 +25,10 @@
 			"type": "string",
 			"default": ""
 		},
+		"imageSize": {
+			"type": "string",
+			"default": "original"
+		},
 		"inlineSVG": {
 			"type": "boolean",
 			"default": false
