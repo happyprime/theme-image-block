@@ -107,7 +107,11 @@ function Edit({ attributes, setAttributes }) {
 
 	// Fetch SVG content when inline SVG is enabled
 	useEffect(() => {
-		if (inlineSVG && imagePath && imagePath.toLowerCase().endsWith('.svg')) {
+		if (
+			inlineSVG &&
+			imagePath &&
+			imagePath.toLowerCase().endsWith('.svg')
+		) {
 			const svgUrl = `${happyprimeData.themeUrl}/${imagePath}`;
 			fetch(svgUrl)
 				.then((response) => response.text())
@@ -127,20 +131,13 @@ function Edit({ attributes, setAttributes }) {
 
 	const blockProps = useBlockProps({
 		className: inlineSVG ? 'has-inline-svg' : '',
-		style: {
-			// Only apply width/height to wrapper for non-inline SVGs
-			// For inline SVGs, dimensions are applied directly to the SVG element
-			...(!inlineSVG && width && { width }),
-			...(!inlineSVG && height && { height }),
-		},
 	});
 
 	const imageUrl =
 		imagePath && happyprimeData?.themeUrl
 			? `${happyprimeData.themeUrl}/${imagePath}`
 			: '';
-	const isSVG =
-		imagePath && imagePath.toLowerCase().endsWith('.svg');
+	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
 	// Process inline SVG if needed
 	let processedSvg = null;
@@ -168,9 +165,8 @@ function Edit({ attributes, setAttributes }) {
 			if (styleMatch) {
 				// Merge with existing style
 				const existingStyle = styleMatch[1];
-				processedSvg = svgContent.replace(
-					/<svg([^>]*)>/,
-					(match) => match.replace(
+				processedSvg = svgContent.replace(/<svg([^>]*)>/, (match) =>
+					match.replace(
 						/style="[^"]*"/,
 						`style="${existingStyle}; ${styleAttr}"`
 					)
@@ -211,11 +207,23 @@ function Edit({ attributes, setAttributes }) {
 			content = null;
 		}
 	} else {
+		// Build inline styles for img element
+		const imgStyles = {};
+		if (width) {
+			imgStyles.width = width;
+		}
+		if (height) {
+			imgStyles.height = height;
+		}
+
 		const img = (
 			<img
 				src={imageUrl}
 				alt={
 					currentImage?.alt || __('Theme image preview', 'happyprime')
+				}
+				style={
+					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
 				}
 			/>
 		);
@@ -231,7 +239,10 @@ function Edit({ attributes, setAttributes }) {
 	// For inline SVG without link, apply HTML directly to wrapper
 	const wrapperProps =
 		inlineSVG && processedSvg && !linkUrl
-			? { ...blockProps, dangerouslySetInnerHTML: { __html: processedSvg } }
+			? {
+					...blockProps,
+					dangerouslySetInnerHTML: { __html: processedSvg },
+				}
 			: blockProps;
 
 	return (
