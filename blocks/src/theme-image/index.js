@@ -37,6 +37,7 @@ import metadata from './block.json';
 function Edit({ attributes, setAttributes }) {
 	const {
 		themeImage,
+		imageSize,
 		inlineSVG,
 		linkUrl,
 		linkTarget,
@@ -80,15 +81,35 @@ function Edit({ attributes, setAttributes }) {
 		(img) => img.slug === themeImage
 	);
 
+	// Build size options from the current image's variations
+	const sizeOptions = [
+		{ value: 'original', label: __('Original', 'happyprime') },
+	];
+
+	if (currentImage && currentImage.variations) {
+		Object.keys(currentImage.variations).forEach((sizeKey) => {
+			// Convert size key to a readable label (e.g., 'large' -> 'Large')
+			const label = sizeKey.charAt(0).toUpperCase() + sizeKey.slice(1);
+			sizeOptions.push({ value: sizeKey, label });
+		});
+	}
+
+	// Get the image path for preview based on selected size
+	let imagePath = currentImage?.value || '';
+	if (
+		currentImage &&
+		imageSize !== 'original' &&
+		currentImage.variations &&
+		currentImage.variations[imageSize]
+	) {
+		imagePath = currentImage.variations[imageSize].path;
+	}
+
 	// Fetch SVG content when inline SVG is enabled
 	useEffect(() => {
-		if (
-			inlineSVG &&
-			currentImage &&
-			currentImage.value.toLowerCase().endsWith('.svg')
-		) {
-			const imageUrl = `${happyprimeData.themeUrl}/${currentImage.value}`;
-			fetch(imageUrl)
+		if (inlineSVG && imagePath && imagePath.toLowerCase().endsWith('.svg')) {
+			const svgUrl = `${happyprimeData.themeUrl}/${imagePath}`;
+			fetch(svgUrl)
 				.then((response) => response.text())
 				.then((svg) => {
 					// Remove XML declaration to match server-side processing
@@ -102,7 +123,7 @@ function Edit({ attributes, setAttributes }) {
 		} else {
 			setSvgContent(null);
 		}
-	}, [inlineSVG, currentImage]);
+	}, [inlineSVG, imagePath]);
 
 	const blockProps = useBlockProps({
 		className: inlineSVG ? 'has-inline-svg' : '',
@@ -114,15 +135,12 @@ function Edit({ attributes, setAttributes }) {
 		},
 	});
 
-	// Get the image URL for preview
 	const imageUrl =
-		currentImage && currentImage.value && happyprimeData?.themeUrl
-			? `${happyprimeData.themeUrl}/${currentImage.value}`
+		imagePath && happyprimeData?.themeUrl
+			? `${happyprimeData.themeUrl}/${imagePath}`
 			: '';
 	const isSVG =
-		currentImage &&
-		currentImage.value &&
-		currentImage.value.toLowerCase().endsWith('.svg');
+		imagePath && imagePath.toLowerCase().endsWith('.svg');
 
 	// Process inline SVG if needed
 	let processedSvg = null;
@@ -307,14 +325,34 @@ function Edit({ attributes, setAttributes }) {
 						label={__('Theme Image', 'happyprime')}
 						value={themeImage}
 						options={themeImages}
-						onChange={(value) =>
-							setAttributes({ themeImage: value })
-						}
+						onChange={(value) => {
+							setAttributes({
+								themeImage: value,
+								imageSize: 'original',
+							});
+						}}
 						help={__(
 							'Select an image from the theme directory.',
 							'happyprime'
 						)}
 					/>
+
+					{currentImage &&
+						currentImage.variations &&
+						Object.keys(currentImage.variations).length > 0 && (
+							<SelectControl
+								label={__('Size', 'happyprime')}
+								value={imageSize}
+								options={sizeOptions}
+								onChange={(value) =>
+									setAttributes({ imageSize: value })
+								}
+								help={__(
+									'Select the image size variation.',
+									'happyprime'
+								)}
+							/>
+						)}
 
 					{isCustomWidth || hasCustomWidthCSS ? (
 						<>
