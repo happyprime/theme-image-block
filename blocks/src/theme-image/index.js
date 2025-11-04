@@ -143,14 +143,15 @@ function Edit({ attributes, setAttributes }) {
 	let processedSvg = null;
 	if (inlineSVG && svgContent) {
 		// Build styles array - use defaults if not specified for editor preview
+		// Validate to prevent CSS injection by rejecting values with semicolons
 		const styles = [];
-		if (width) {
+		if (width && !width.includes(';')) {
 			styles.push(`width: ${width}`);
-		} else {
+		} else if (!width) {
 			// Default width for editor preview when not specified
 			styles.push('width: 100%');
 		}
-		if (height) {
+		if (height && !height.includes(';')) {
 			styles.push(`height: ${height}`);
 		}
 
@@ -208,11 +209,12 @@ function Edit({ attributes, setAttributes }) {
 		}
 	} else {
 		// Build inline styles for img element
+		// Validate to prevent CSS injection by rejecting values with semicolons
 		const imgStyles = {};
-		if (width) {
+		if (width && !width.includes(';')) {
 			imgStyles.width = width;
 		}
-		if (height) {
+		if (height && !height.includes(';')) {
 			imgStyles.height = height;
 		}
 
@@ -373,10 +375,17 @@ function Edit({ attributes, setAttributes }) {
 								onChange={(value) =>
 									setAttributes({ width: value })
 								}
-								help={__(
-									'Enter any valid CSS value',
-									'happyprime'
-								)}
+								help={
+									width && width.includes(';')
+										? __(
+												'Invalid value: semicolons are not allowed',
+												'happyprime'
+											)
+										: __(
+												'Enter any valid CSS value',
+												'happyprime'
+											)
+								}
 								placeholder="clamp(10rem, 50vw, 30rem)"
 							/>
 							<Button
@@ -436,10 +445,17 @@ function Edit({ attributes, setAttributes }) {
 								onChange={(value) =>
 									setAttributes({ height: value })
 								}
-								help={__(
-									'Enter any valid CSS value',
-									'happyprime'
-								)}
+								help={
+									height && height.includes(';')
+										? __(
+												'Invalid value: semicolons are not allowed',
+												'happyprime'
+											)
+										: __(
+												'Enter any valid CSS value',
+												'happyprime'
+											)
+								}
 								placeholder="clamp(10rem, 50vh, 30rem)"
 							/>
 							<Button
