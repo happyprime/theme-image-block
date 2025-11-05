@@ -193,7 +193,7 @@ class Block {
 		$wrapper_attrs = array( 'class' => implode( ' ', $wrapper_classes ) );
 
 		return sprintf(
-			'<div %s>%s</div>',
+			'<figure %s>%s</figure>',
 			get_block_wrapper_attributes( $wrapper_attrs ),
 			$content
 		);
