@@ -15,14 +15,13 @@ class Block {
 	 * Render the theme image block.
 	 *
 	 * @param array<string, string> $attributes Block attributes. {
-	 *     @type string $themeImage The slug of the theme image to display. Required.
-	 *     @type string $imageSize  The size variation to display. Default 'original'.
-	 *     @type bool   $inlineSVG  Whether to inline SVG content instead of using an img tag. Default false.
-	 *     @type string $linkUrl    URL for wrapping the image in a link. Default empty string.
-	 *     @type string $linkTarget Target attribute for the link (e.g., '_blank'). Default empty string.
-	 *     @type string $linkRel    Rel attribute for the link (e.g., 'nofollow'). Default empty string.
-	 *     @type string $width      CSS width value for the image. Default empty string.
-	 *     @type string $height     CSS height value for the image. Default empty string.
+	 *     @type string $themeImage  The slug of the theme image to display. Required.
+	 *     @type string $imageSize   The size variation to display. Default 'original'.
+	 *     @type string $imageStyle  The slug of the registered style to apply. Default empty string.
+	 *     @type bool   $inlineSVG   Whether to inline SVG content instead of using an img tag. Default false.
+	 *     @type string $linkUrl     URL for wrapping the image in a link. Default empty string.
+	 *     @type string $linkTarget  Target attribute for the link (e.g., '_blank'). Default empty string.
+	 *     @type string $linkRel     Rel attribute for the link (e.g., 'nofollow'). Default empty string.
 	 * }
 	 * @param string                $content    Block content.
 	 *
@@ -49,19 +48,21 @@ class Block {
 		$link_target = isset( $attributes['linkTarget'] ) ? esc_attr( $attributes['linkTarget'] ) : '';
 		$link_rel    = isset( $attributes['linkRel'] ) ? esc_attr( $attributes['linkRel'] ) : '';
 
-		// Validate and sanitize width/height. Reject values with semicolons to prevent CSS injection.
+		// Get width/height from registered style if imageStyle is set.
 		$width  = '';
 		$height = '';
-		if ( isset( $attributes['width'] ) && ! empty( $attributes['width'] ) ) {
-			$width_value = $attributes['width'];
-			if ( false === strpos( $width_value, ';' ) ) {
-				$width = esc_attr( $width_value );
-			}
-		}
-		if ( isset( $attributes['height'] ) && ! empty( $attributes['height'] ) ) {
-			$height_value = $attributes['height'];
-			if ( false === strpos( $height_value, ';' ) ) {
-				$height = esc_attr( $height_value );
+		if ( isset( $attributes['imageStyle'] ) && ! empty( $attributes['imageStyle'] ) ) {
+			$style_slug = sanitize_key( $attributes['imageStyle'] );
+			$style_data = StyleRegistry::get( $style_slug );
+
+			if ( $style_data ) {
+				// Validate to prevent CSS injection by rejecting values with semicolons.
+				if ( ! empty( $style_data['width'] ) && false === strpos( $style_data['width'], ';' ) ) {
+					$width = esc_attr( $style_data['width'] );
+				}
+				if ( ! empty( $style_data['height'] ) && false === strpos( $style_data['height'], ';' ) ) {
+					$height = esc_attr( $style_data['height'] );
+				}
 			}
 		}
 

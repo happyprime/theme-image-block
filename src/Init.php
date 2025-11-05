@@ -38,13 +38,14 @@ class Init {
 		$script_handle = generate_block_asset_handle( 'happyprime/theme-image', 'editorScript' );
 
 		if ( wp_script_is( $script_handle, 'registered' ) ) {
-			// Pass theme URL and registered images to JavaScript.
+			// Pass theme URL, registered images, and styles to JavaScript.
 			wp_localize_script(
 				$script_handle,
 				'happyprimeData',
 				array(
 					'themeUrl' => get_template_directory_uri(),
 					'images'   => Registry::get_for_editor(),
+					'styles'   => StyleRegistry::get_for_editor(),
 				)
 			);
 		}

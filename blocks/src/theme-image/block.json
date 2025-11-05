@@ -26,6 +26,10 @@
 			"type": "string",
 			"default": "original"
 		},
+		"imageStyle": {
+			"type": "string",
+			"default": ""
+		},
 		"inlineSVG": {
 			"type": "boolean",
 			"default": false
@@ -39,14 +43,6 @@
 			"default": ""
 		},
 		"linkRel": {
-			"type": "string",
-			"default": ""
-		},
-		"width": {
-			"type": "string",
-			"default": ""
-		},
-		"height": {
 			"type": "string",
 			"default": ""
 		}

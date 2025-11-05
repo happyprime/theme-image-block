@@ -82,4 +82,27 @@ function register_theme_image( string $slug, array $args ): bool {
 	return \HappyPrime\ThemeImageBlock\Registry::register( $slug, $args );
 }
 
+/**
+ * Register a theme image style.
+ *
+ * This function can be used by themes and plugins to register styles that
+ * control the dimensions of images in the Theme Image block.
+ *
+ * @since 0.1.0
+ *
+ * @param string               $slug Unique identifier for the style.
+ * @param array<string, mixed> $args {
+ *     Style configuration arguments.
+ *
+ *     @type string $name   Display name for the style (required).
+ *     @type string $width  CSS width value (optional).
+ *     @type string $height CSS height value (optional).
+ * }
+ *
+ * @return bool True if registered successfully, false otherwise.
+ */
+function register_theme_image_style( string $slug, array $args ): bool {
+	return \HappyPrime\ThemeImageBlock\StyleRegistry::register( $slug, $args );
+}
+
 add_action( 'plugins_loaded', [ Init::class, 'init' ] );

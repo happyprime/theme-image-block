@@ -11,12 +11,9 @@ import { registerBlockType } from '@wordpress/blocks';
 import {
 	PanelBody,
 	SelectControl,
-	TextControl,
 	ToggleControl,
-	Button,
 	ToolbarButton,
 	Popover,
-	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
@@ -38,34 +35,18 @@ function Edit({ attributes, setAttributes }) {
 	const {
 		themeImage,
 		imageSize,
+		imageStyle,
 		inlineSVG,
 		linkUrl,
 		linkTarget,
 		linkRel,
-		width,
-		height,
 	} = attributes;
-	const [isCustomWidth, setIsCustomWidth] = useState(false);
-	const [isCustomHeight, setIsCustomHeight] = useState(false);
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
 
-	// Check if width/height contains custom CSS functions
-	const hasCustomWidthCSS =
-		width &&
-		(width.includes('clamp') ||
-			width.includes('calc') ||
-			width.includes('min') ||
-			width.includes('max'));
-	const hasCustomHeightCSS =
-		height &&
-		(height.includes('clamp') ||
-			height.includes('calc') ||
-			height.includes('min') ||
-			height.includes('max'));
-
-	// Get registered theme images from localized data
+	// Get registered theme images and styles from localized data
 	const registeredImages = happyprimeData?.images || [];
+	const registeredStyles = happyprimeData?.styles || [];
 
 	// Build the options array for the SelectControl
 	const themeImages = [
@@ -139,10 +120,17 @@ function Edit({ attributes, setAttributes }) {
 			: '';
 	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
+	// Get the selected style's dimensions
+	const currentStyle = registeredStyles.find(
+		(style) => style.slug === imageStyle
+	);
+	const width = currentStyle?.width || '';
+	const height = currentStyle?.height || '';
+
 	// Process inline SVG if needed
 	let processedSvg = null;
 	if (inlineSVG && svgContent) {
-		// Build styles array - use defaults if not specified for editor preview
+		// Build styles array for editor preview
 		// Validate to prevent CSS injection by rejecting values with semicolons
 		const styles = [];
 		if (width && !width.includes(';')) {
@@ -367,145 +355,24 @@ function Edit({ attributes, setAttributes }) {
 							/>
 						)}
 
-					{isCustomWidth || hasCustomWidthCSS ? (
-						<>
-							<TextControl
-								label={__('Width', 'happyprime')}
-								value={width}
-								onChange={(value) =>
-									setAttributes({ width: value })
-								}
-								help={
-									width && width.includes(';')
-										? __(
-												'Invalid value: semicolons are not allowed',
-												'happyprime'
-											)
-										: __(
-												'Enter any valid CSS value',
-												'happyprime'
-											)
-								}
-								placeholder="clamp(10rem, 50vw, 30rem)"
-							/>
-							<Button
-								variant="link"
-								onClick={() => {
-									setIsCustomWidth(false);
-									setAttributes({ width: '' });
-								}}
-								style={{
-									display: 'block',
-									marginTop: '-8px',
-									marginBottom: '16px',
-								}}
-							>
-								{__('Use preset units', 'happyprime')}
-							</Button>
-						</>
-					) : (
-						<>
-							<UnitControl
-								label={__('Width', 'happyprime')}
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={width}
-								onChange={(value) =>
-									setAttributes({ width: value })
-								}
-								units={[
-									{ value: 'px', label: 'px', default: 0 },
-									{ value: '%', label: '%', default: 100 },
-									{ value: 'em', label: 'em', default: 0 },
-									{ value: 'rem', label: 'rem', default: 0 },
-									{ value: 'vw', label: 'vw', default: 0 },
-									{ value: 'vh', label: 'vh', default: 0 },
-									{ value: 'lh', label: 'lh', default: 1 },
-								]}
-							/>
-							<Button
-								variant="link"
-								onClick={() => setIsCustomWidth(true)}
-								style={{
-									display: 'block',
-									marginTop: '-8px',
-									marginBottom: '16px',
-								}}
-							>
-								{__('Use custom CSS', 'happyprime')}
-							</Button>
-						</>
-					)}
-
-					{isCustomHeight || hasCustomHeightCSS ? (
-						<>
-							<TextControl
-								label={__('Height', 'happyprime')}
-								value={height}
-								onChange={(value) =>
-									setAttributes({ height: value })
-								}
-								help={
-									height && height.includes(';')
-										? __(
-												'Invalid value: semicolons are not allowed',
-												'happyprime'
-											)
-										: __(
-												'Enter any valid CSS value',
-												'happyprime'
-											)
-								}
-								placeholder="clamp(10rem, 50vh, 30rem)"
-							/>
-							<Button
-								variant="link"
-								onClick={() => {
-									setIsCustomHeight(false);
-									setAttributes({ height: '' });
-								}}
-								style={{
-									display: 'block',
-									marginTop: '-8px',
-									marginBottom: '16px',
-								}}
-							>
-								{__('Use preset units', 'happyprime')}
-							</Button>
-						</>
-					) : (
-						<>
-							<UnitControl
-								label={__('Height', 'happyprime')}
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={height}
-								onChange={(value) =>
-									setAttributes({ height: value })
-								}
-								units={[
-									{ value: 'px', label: 'px', default: 0 },
-									{ value: '%', label: '%', default: 100 },
-									{ value: 'em', label: 'em', default: 0 },
-									{ value: 'rem', label: 'rem', default: 0 },
-									{ value: 'vw', label: 'vw', default: 0 },
-									{ value: 'vh', label: 'vh', default: 0 },
-									{ value: 'lh', label: 'lh', default: 1 },
-								]}
-							/>
-							<Button
-								variant="link"
-								onClick={() => setIsCustomHeight(true)}
-								style={{
-									display: 'block',
-									marginTop: '-8px',
-									marginBottom: '16px',
-								}}
-							>
-								{__('Use custom CSS', 'happyprime')}
-							</Button>
-						</>
-					)}
+					<SelectControl
+						label={__('Image Style', 'happyprime')}
+						value={imageStyle}
+						options={[
+							{ value: '', label: __('Default', 'happyprime') },
+							...registeredStyles.map((style) => ({
+								value: style.slug,
+								label: style.name,
+							})),
+						]}
+						onChange={(value) =>
+							setAttributes({ imageStyle: value })
+						}
+						help={__(
+							'Select a registered style to control image dimensions.',
+							'happyprime'
+						)}
+					/>
 
 					{isSVG && (
 						<ToggleControl
