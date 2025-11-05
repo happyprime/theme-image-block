@@ -48,8 +48,22 @@ class Block {
 		$link_url    = isset( $attributes['linkUrl'] ) ? esc_url( $attributes['linkUrl'] ) : '';
 		$link_target = isset( $attributes['linkTarget'] ) ? esc_attr( $attributes['linkTarget'] ) : '';
 		$link_rel    = isset( $attributes['linkRel'] ) ? esc_attr( $attributes['linkRel'] ) : '';
-		$width       = isset( $attributes['width'] ) && ! empty( $attributes['width'] ) ? esc_attr( $attributes['width'] ) : '';
-		$height      = isset( $attributes['height'] ) && ! empty( $attributes['height'] ) ? esc_attr( $attributes['height'] ) : '';
+
+		// Validate and sanitize width/height. Reject values with semicolons to prevent CSS injection.
+		$width  = '';
+		$height = '';
+		if ( isset( $attributes['width'] ) && ! empty( $attributes['width'] ) ) {
+			$width_value = $attributes['width'];
+			if ( false === strpos( $width_value, ';' ) ) {
+				$width = esc_attr( $width_value );
+			}
+		}
+		if ( isset( $attributes['height'] ) && ! empty( $attributes['height'] ) ) {
+			$height_value = $attributes['height'];
+			if ( false === strpos( $height_value, ';' ) ) {
+				$height = esc_attr( $height_value );
+			}
+		}
 
 		// Determine the image path based on selected size.
 		$display_path = $image_data['path'];

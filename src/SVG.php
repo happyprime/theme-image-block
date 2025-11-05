@@ -45,12 +45,12 @@ class SVG {
 
 			$processor->set_attribute( 'focusable', 'false' );
 
-			// Apply width/height to SVG if set.
+			// Apply width/height to SVG if set. Validate to prevent CSS injection.
 			$inline_styles = array();
-			if ( $args['width'] ) {
+			if ( $args['width'] && false === strpos( $args['width'], ';' ) ) {
 				$inline_styles[] = 'width: ' . $args['width'];
 			}
-			if ( $args['height'] ) {
+			if ( $args['height'] && false === strpos( $args['height'], ';' ) ) {
 				$inline_styles[] = 'height: ' . $args['height'];
 			}
 			if ( ! empty( $inline_styles ) ) {
