@@ -44,11 +44,11 @@ function Edit({ attributes, setAttributes }) {
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
 
-	// Get registered theme images and styles from localized data
+	// Get registered theme images and styles from localized data.
 	const registeredImages = happyprimeData?.images || [];
 	const registeredStyles = happyprimeData?.styles || [];
 
-	// Build the options array for the SelectControl
+	// Build the options array for the SelectControl.
 	const themeImages = [
 		{ value: '', label: __('Select an image', 'happyprime') },
 		...registeredImages.map((image) => ({
@@ -57,12 +57,12 @@ function Edit({ attributes, setAttributes }) {
 		})),
 	];
 
-	// Find the currently selected image data
+	// Find the currently selected image data.
 	const currentImage = registeredImages.find(
 		(img) => img.slug === themeImage
 	);
 
-	// Build size options from the current image's variations
+	// Build size options from the current image's variations.
 	const sizeOptions = [
 		{ value: 'original', label: __('Original', 'happyprime') },
 	];
@@ -75,7 +75,7 @@ function Edit({ attributes, setAttributes }) {
 		});
 	}
 
-	// Get the image path for preview based on selected size
+	// Get the image path for preview based on selected size.
 	let imagePath = currentImage?.value || '';
 	if (
 		currentImage &&
@@ -86,7 +86,7 @@ function Edit({ attributes, setAttributes }) {
 		imagePath = currentImage.variations[imageSize].path;
 	}
 
-	// Fetch SVG content when inline SVG is enabled
+	// Fetch SVG content when inline SVG is enabled.
 	useEffect(() => {
 		if (
 			inlineSVG &&
@@ -97,7 +97,7 @@ function Edit({ attributes, setAttributes }) {
 			fetch(svgUrl)
 				.then((response) => response.text())
 				.then((svg) => {
-					// Remove XML declaration to match server-side processing
+					// Remove XML declaration to match server-side processing.
 					const cleanedSvg = svg.replace(/^<\?xml\s+.*?\?>\s*/s, '');
 					setSvgContent(cleanedSvg);
 				})
@@ -120,14 +120,14 @@ function Edit({ attributes, setAttributes }) {
 			: '';
 	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
-	// Get the selected style's dimensions
+	// Get the selected style's dimensions.
 	const currentStyle = registeredStyles.find(
 		(style) => style.slug === imageStyle
 	);
 	const width = currentStyle?.width || '';
 	const height = currentStyle?.height || '';
 
-	// Process inline SVG if needed
+	// Process inline SVG if needed.
 	let processedSvg = null;
 	if (inlineSVG && svgContent) {
 		// Build styles array for editor preview
@@ -161,7 +161,7 @@ function Edit({ attributes, setAttributes }) {
 					)
 				);
 			} else {
-				// Add new style attribute
+				// Add new style attribute.
 				processedSvg = svgContent.replace(
 					/<svg([^>]*)>/,
 					`<svg$1 style="${styleAttr}">`
@@ -170,8 +170,6 @@ function Edit({ attributes, setAttributes }) {
 		}
 	}
 
-	// Build content based on image type and link settings
-	// Structure matches server-side: <figure><a?><svg|img></a?></figure>
 	let content;
 	if (!imageUrl) {
 		content = (
@@ -181,7 +179,7 @@ function Edit({ attributes, setAttributes }) {
 		);
 	} else if (inlineSVG && processedSvg) {
 		// For inline SVG, apply dangerouslySetInnerHTML to link or wrapper
-		// to match server-side structure without extra figure wrapper
+		// to match server-side structure without extra figure wrapper.
 		if (linkUrl) {
 			content = (
 				<a
@@ -192,7 +190,7 @@ function Edit({ attributes, setAttributes }) {
 				/>
 			);
 		} else {
-			// Will be applied to wrapper figure via blockProps below
+			// Will be applied to wrapper figure via blockProps below.
 			content = null;
 		}
 	} else {
@@ -226,7 +224,7 @@ function Edit({ attributes, setAttributes }) {
 		);
 	}
 
-	// For inline SVG without link, apply HTML directly to wrapper
+	// For inline SVG without link, apply HTML directly to wrapper.
 	const wrapperProps =
 		inlineSVG && processedSvg && !linkUrl
 			? {
@@ -276,7 +274,6 @@ function Edit({ attributes, setAttributes }) {
 							nofollow: linkRel?.includes('nofollow'),
 						}}
 						onChange={(newLink) => {
-							// Build rel attribute from settings
 							const relParts = [];
 
 							if (newLink?.opensInNewTab) {
