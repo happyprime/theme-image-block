@@ -3,6 +3,7 @@
 .github/
 .wordpress-org/
 bin/
+node_modules/
 tests/
 .browserslistrc
 .distignore
