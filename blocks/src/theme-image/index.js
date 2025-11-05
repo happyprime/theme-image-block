@@ -330,7 +330,7 @@ function Edit({ attributes, setAttributes }) {
 							});
 						}}
 						help={__(
-							'Select an image from the theme directory.',
+							'Select a registered theme image.',
 							'happyprime'
 						)}
 					/>
@@ -339,21 +339,21 @@ function Edit({ attributes, setAttributes }) {
 						currentImage.variations &&
 						Object.keys(currentImage.variations).length > 0 && (
 							<SelectControl
-								label={__('Size', 'happyprime')}
+								label={__('Variation', 'happyprime')}
 								value={imageSize}
 								options={sizeOptions}
 								onChange={(value) =>
 									setAttributes({ imageSize: value })
 								}
 								help={__(
-									'Select the image size variation.',
+									'Select the image variation.',
 									'happyprime'
 								)}
 							/>
 						)}
 
 					<SelectControl
-						label={__('Image Style', 'happyprime')}
+						label={__('Style', 'happyprime')}
 						value={imageStyle}
 						options={[
 							{ value: '', label: __('Default', 'happyprime') },
@@ -366,7 +366,7 @@ function Edit({ attributes, setAttributes }) {
 							setAttributes({ imageStyle: value })
 						}
 						help={__(
-							'Select a registered style to control image dimensions.',
+							'Select a registered style to apply image dimensions.',
 							'happyprime'
 						)}
 					/>
