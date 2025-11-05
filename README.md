@@ -8,9 +8,10 @@ The Theme Image Block plugin allows you to register images from your theme and m
 
 ## Installation
 
-1. Install and activate the plugin
-2. Register theme images using the `register_theme_image()` function
-3. Use the Theme Image block in the editor to insert registered images
+1. Install and activate the plugin.
+2. Register theme images using the `register_theme_image()` function.
+3. Register theme image styles using the `register_theme_image_style()` function.
+3. Use the Theme Image block in the editor to insert registered images.
 
 ## Usage
 
@@ -50,45 +51,17 @@ HappyPrime\ThemeImageBlock\register_theme_image(
 );
 ```
 
-### Function Reference
+### Registering Theme Image Styles
 
-#### `register_theme_image( string $slug, array $args )`
+Theme image styles should be registered using `HappyPrime\ThemeImageBlock\register_theme_image_style()`. This is likely best done on the `init` or `after_setup_theme` action.
 
-Registers a theme image for use in the Theme Image block.
-
-**Parameters:**
-
-- `$slug` (string, required): Unique identifier for the image.
-- `$args` (array, required): Image configuration arguments.
-  - `title` (string, required): Display title for the image shown in the block selector.
-  - `description` (string, optional): Description of the image.
-  - `alt` (string, optional): Default alt text for accessibility.
-  - `path` (string, required): Path to the image file relative to the theme directory.
-  - `width` (string, optional): Width of the main image in pixels. Used to build the srcset attribute.
-  - `height` (string, optional): Height of the main image in pixels.
-  - `variations` (array, optional): Array of image variations with different sizes. Each variation should include `path`, `width`, and `height`. Used to build the srcset attribute.
-  - `sizes` (string, optional): Value for the HTML sizes attribute. Controls which image size the browser selects from srcset based on layout. Example: `(max-width: 600px) 100vw, 300px`.
-
-**Returns:** Boolean indicating success.
-
-### Using the Block
-
-1. In the WordPress editor, add a new block
-2. Search for "Theme Image"
-3. Select an image from the dropdown
-4. Configure the image settings in the sidebar:
-   - Alt text for accessibility
-   - Width and height (supports all CSS units and functions like `clamp()`)
-   - Inline SVG option for SVG files (for better styling control)
-   - Link settings via the block toolbar
-
-## Features
-
-- **PHP-based registration**: Register images from your theme or plugin code
-- **Rich metadata**: Include titles, descriptions, alt text, and image variations
-- **Responsive images**: Automatic srcset generation from registered variations for optimal image loading
-- **Custom sizes attribute**: Define custom sizes strings to control responsive image selection
-- **Flexible dimensions**: Support for all CSS units and functions (px, %, rem, clamp, calc, etc.)
-- **Inline SVG support**: Render SVG files inline for better styling control
-- **Link support**: Add links to images with target and rel options
-- **Block supports**: Includes alignment, colors, spacing, and more
+```php
+HappyPrime\ThemeImageBlock\register_theme_image_style(
+	'hero',
+	[
+		'name'   => 'Hero',
+		'width'  => 'clamp(10rem, 100vw, 60rem)',
+		'height' => 'auto',
+	]
+);
+```
