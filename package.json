@@ -27,6 +27,7 @@
     "@babel/preset-react": "^7.28.5",
     "@happyprime/eslint-config": "^0.0.14",
     "@wordpress/dependency-extraction-webpack-plugin": "^6.34.0",
+    "@wordpress/icons": "^11.1.0",
     "@wordpress/npm-package-json-lint-config": "^5.34.0",
     "babel-loader": "^10.0.0",
     "copy-webpack-plugin": "^13.0.1",

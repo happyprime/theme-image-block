@@ -21,7 +21,7 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
-	 *     variations: array<string, array{path: string, width: string, height: string}>,
+	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }>
 	 */
@@ -112,7 +112,7 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
-	 *     variations: array<string, array{path: string, width: string, height: string}>,
+	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }> Registered images, keyed by image slug.
 	 */
@@ -132,7 +132,7 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
-	 *     variations: array<string, array{path: string, width: string, height: string}>,
+	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }|null Image data or null if not found.
 	 */
@@ -203,7 +203,7 @@ class Registry {
 	 *
 	 * @param mixed $variations Image variations.
 	 *
-	 * @return array<string, array{path: string, width: string, height: string}> Sanitized variations.
+	 * @return array<string, array{name: string, path: string, width: string, height: string}> Sanitized variations.
 	 */
 	private static function sanitize_variations( $variations ): array {
 		if ( ! is_array( $variations ) ) {
@@ -218,6 +218,7 @@ class Registry {
 			}
 
 			$sanitized[ sanitize_key( $size ) ] = array(
+				'name'   => isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '',
 				'path'   => isset( $data['path'] ) ? sanitize_text_field( $data['path'] ) : '',
 				'width'  => isset( $data['width'] ) ? sanitize_text_field( $data['width'] ) : '',
 				'height' => isset( $data['height'] ) ? sanitize_text_field( $data['height'] ) : '',

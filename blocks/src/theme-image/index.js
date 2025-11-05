@@ -5,6 +5,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	BlockControls,
+	BlockIcon,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { registerBlockType } from '@wordpress/blocks';
@@ -14,9 +15,11 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	Popover,
+	Placeholder,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { image } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,38 +47,40 @@ function Edit({ attributes, setAttributes }) {
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
 
-	// Get registered theme images and styles from localized data
+	// Get registered theme images and styles from localized data.
 	const registeredImages = happyprimeData?.images || [];
 	const registeredStyles = happyprimeData?.styles || [];
 
-	// Build the options array for the SelectControl
+	// Build the options array for the SelectControl.
 	const themeImages = [
-		{ value: '', label: __('Select an image', 'happyprime') },
+		{ value: '', label: __('Select an image', 'theme-image-block') },
 		...registeredImages.map((image) => ({
 			value: image.slug,
 			label: image.label,
 		})),
 	];
 
-	// Find the currently selected image data
+	// Find the currently selected image data.
 	const currentImage = registeredImages.find(
 		(img) => img.slug === themeImage
 	);
 
-	// Build size options from the current image's variations
+	// Build size options from the current image's variations.
 	const sizeOptions = [
-		{ value: 'original', label: __('Original', 'happyprime') },
+		{ value: 'original', label: __('Original', 'theme-image-block') },
 	];
 
 	if (currentImage && currentImage.variations) {
 		Object.keys(currentImage.variations).forEach((sizeKey) => {
-			// Convert size key to a readable label (e.g., 'large' -> 'Large')
-			const label = sizeKey.charAt(0).toUpperCase() + sizeKey.slice(1);
-			sizeOptions.push({ value: sizeKey, label });
+			const variation = currentImage.variations[sizeKey];
+			sizeOptions.push({
+				value: sizeKey,
+				label: variation.name || sizeKey,
+			});
 		});
 	}
 
-	// Get the image path for preview based on selected size
+	// Get the image path for preview based on selected size.
 	let imagePath = currentImage?.value || '';
 	if (
 		currentImage &&
@@ -86,7 +91,7 @@ function Edit({ attributes, setAttributes }) {
 		imagePath = currentImage.variations[imageSize].path;
 	}
 
-	// Fetch SVG content when inline SVG is enabled
+	// Fetch SVG content when inline SVG is enabled.
 	useEffect(() => {
 		if (
 			inlineSVG &&
@@ -97,9 +102,7 @@ function Edit({ attributes, setAttributes }) {
 			fetch(svgUrl)
 				.then((response) => response.text())
 				.then((svg) => {
-					// Remove XML declaration to match server-side processing
-					const cleanedSvg = svg.replace(/^<\?xml\s+.*?\?>\s*/s, '');
-					setSvgContent(cleanedSvg);
+					setSvgContent(svg);
 				})
 				.catch((error) => {
 					console.error('Failed to fetch SVG:', error);
@@ -120,39 +123,38 @@ function Edit({ attributes, setAttributes }) {
 			: '';
 	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
-	// Get the selected style's dimensions
+	// Get the selected style's dimensions.
 	const currentStyle = registeredStyles.find(
 		(style) => style.slug === imageStyle
 	);
 	const width = currentStyle?.width || '';
 	const height = currentStyle?.height || '';
 
-	// Process inline SVG if needed
+	// Process inline SVG if needed.
 	let processedSvg = null;
 	if (inlineSVG && svgContent) {
-		// Build styles array for editor preview
-		// Validate to prevent CSS injection by rejecting values with semicolons
+		// Build styles array for editor preview.
 		const styles = [];
-		if (width && !width.includes(';')) {
+		if (width) {
 			styles.push(`width: ${width}`);
 		} else if (!width) {
-			// Default width for editor preview when not specified
+			// Default width for editor preview when not specified.
 			styles.push('width: 100%');
 		}
-		if (height && !height.includes(';')) {
+		if (height) {
 			styles.push(`height: ${height}`);
 		}
 
 		const styleAttr = styles.join('; ');
 
-		// Insert or merge style attribute into the SVG tag
+		// Insert or merge style attribute into the SVG tag.
 		const svgMatch = svgContent.match(/<svg([^>]*)>/);
 		if (svgMatch) {
 			const existingAttrs = svgMatch[1];
 			const styleMatch = existingAttrs.match(/style="([^"]*)"/);
 
 			if (styleMatch) {
-				// Merge with existing style
+				// Merge with existing style.
 				const existingStyle = styleMatch[1];
 				processedSvg = svgContent.replace(/<svg([^>]*)>/, (match) =>
 					match.replace(
@@ -161,7 +163,7 @@ function Edit({ attributes, setAttributes }) {
 					)
 				);
 			} else {
-				// Add new style attribute
+				// Add new style attribute.
 				processedSvg = svgContent.replace(
 					/<svg([^>]*)>/,
 					`<svg$1 style="${styleAttr}">`
@@ -170,18 +172,21 @@ function Edit({ attributes, setAttributes }) {
 		}
 	}
 
-	// Build content based on image type and link settings
-	// Structure matches server-side: <figure><a?><svg|img></a?></figure>
 	let content;
 	if (!imageUrl) {
 		content = (
-			<div className="theme-image-placeholder">
-				{__('Select a theme image from the sidebar', 'happyprime')}
-			</div>
+			<Placeholder
+				icon={<BlockIcon icon={image} />}
+				label={__('Theme Image', 'theme-image-block')}
+				instructions={__(
+					'Select an image from the block settings',
+					'theme-image-block'
+				)}
+			/>
 		);
 	} else if (inlineSVG && processedSvg) {
 		// For inline SVG, apply dangerouslySetInnerHTML to link or wrapper
-		// to match server-side structure without extra figure wrapper
+		// to match server-side structure without extra figure wrapper.
 		if (linkUrl) {
 			content = (
 				<a
@@ -192,17 +197,16 @@ function Edit({ attributes, setAttributes }) {
 				/>
 			);
 		} else {
-			// Will be applied to wrapper figure via blockProps below
+			// Will be applied to wrapper figure via blockProps below.
 			content = null;
 		}
 	} else {
-		// Build inline styles for img element
-		// Validate to prevent CSS injection by rejecting values with semicolons
+		// Build inline styles for img element.
 		const imgStyles = {};
-		if (width && !width.includes(';')) {
+		if (width) {
 			imgStyles.width = width;
 		}
-		if (height && !height.includes(';')) {
+		if (height) {
 			imgStyles.height = height;
 		}
 
@@ -210,7 +214,7 @@ function Edit({ attributes, setAttributes }) {
 			<img
 				src={imageUrl}
 				alt={
-					currentImage?.alt || __('Theme image preview', 'happyprime')
+					currentImage?.alt || __('Theme image preview', 'theme-image-block')
 				}
 				style={
 					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
@@ -226,7 +230,7 @@ function Edit({ attributes, setAttributes }) {
 		);
 	}
 
-	// For inline SVG without link, apply HTML directly to wrapper
+	// For inline SVG without link, apply HTML directly to wrapper.
 	const wrapperProps =
 		inlineSVG && processedSvg && !linkUrl
 			? {
@@ -241,14 +245,14 @@ function Edit({ attributes, setAttributes }) {
 				<BlockControls group="block">
 					<ToolbarButton
 						icon="admin-links"
-						label={__('Link', 'happyprime')}
+						label={__('Link', 'theme-image-block')}
 						onClick={() => setIsEditingLink(true)}
 						isActive={!!linkUrl}
 					/>
 					{linkUrl && (
 						<ToolbarButton
 							icon="editor-unlink"
-							label={__('Unlink', 'happyprime')}
+							label={__('Unlink', 'theme-image-block')}
 							onClick={() => {
 								setAttributes({
 									linkUrl: '',
@@ -276,7 +280,6 @@ function Edit({ attributes, setAttributes }) {
 							nofollow: linkRel?.includes('nofollow'),
 						}}
 						onChange={(newLink) => {
-							// Build rel attribute from settings
 							const relParts = [];
 
 							if (newLink?.opensInNewTab) {
@@ -306,11 +309,11 @@ function Edit({ attributes, setAttributes }) {
 						settings={[
 							{
 								id: 'opensInNewTab',
-								title: __('Open in new tab', 'happyprime'),
+								title: __('Open in new tab', 'theme-image-block'),
 							},
 							{
 								id: 'nofollow',
-								title: __('Mark as nofollow', 'happyprime'),
+								title: __('Mark as nofollow', 'theme-image-block'),
 							},
 						]}
 					/>
@@ -319,11 +322,11 @@ function Edit({ attributes, setAttributes }) {
 
 			<InspectorControls>
 				<PanelBody
-					title={__('Settings', 'happyprime')}
+					title={__('Settings', 'theme-image-block')}
 					initialOpen={true}
 				>
 					<SelectControl
-						label={__('Theme Image', 'happyprime')}
+						label={__('Theme Image', 'theme-image-block')}
 						value={themeImage}
 						options={themeImages}
 						onChange={(value) => {
@@ -333,8 +336,8 @@ function Edit({ attributes, setAttributes }) {
 							});
 						}}
 						help={__(
-							'Select an image from the theme directory.',
-							'happyprime'
+							'Select a registered theme image.',
+							'theme-image-block'
 						)}
 					/>
 
@@ -342,24 +345,24 @@ function Edit({ attributes, setAttributes }) {
 						currentImage.variations &&
 						Object.keys(currentImage.variations).length > 0 && (
 							<SelectControl
-								label={__('Size', 'happyprime')}
+								label={__('Variation', 'theme-image-block')}
 								value={imageSize}
 								options={sizeOptions}
 								onChange={(value) =>
 									setAttributes({ imageSize: value })
 								}
 								help={__(
-									'Select the image size variation.',
-									'happyprime'
+									'Select the image variation.',
+									'theme-image-block'
 								)}
 							/>
 						)}
 
 					<SelectControl
-						label={__('Image Style', 'happyprime')}
+						label={__('Style', 'theme-image-block')}
 						value={imageStyle}
 						options={[
-							{ value: '', label: __('Default', 'happyprime') },
+							{ value: '', label: __('Default', 'theme-image-block') },
 							...registeredStyles.map((style) => ({
 								value: style.slug,
 								label: style.name,
@@ -369,21 +372,21 @@ function Edit({ attributes, setAttributes }) {
 							setAttributes({ imageStyle: value })
 						}
 						help={__(
-							'Select a registered style to control image dimensions.',
-							'happyprime'
+							'Select a registered style to apply.',
+							'theme-image-block'
 						)}
 					/>
 
 					{isSVG && (
 						<ToggleControl
-							label={__('Inline SVG', 'happyprime')}
+							label={__('Inline SVG', 'theme-image-block')}
 							checked={inlineSVG}
 							onChange={(value) =>
 								setAttributes({ inlineSVG: value })
 							}
 							help={__(
-								'Render SVG code inline for better styling control.',
-								'happyprime'
+								'Render SVG code inline.',
+								'theme-image-block'
 							)}
 						/>
 					)}

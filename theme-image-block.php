@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name:  Theme Images Block
+ * Plugin Name:  Theme Image Block
  * Description:  Use images from your theme as blocks in content.
- * Version:      0.0.1
+ * Version:      1.0.0
  * Author:       Happy Prime
  * Author URI:   https://happyprime.co
  * License:      GPL-2.0-or-later
  * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:  happyprime
+ * Text Domain:  theme-image-block
  * Domain Path:  /languages
  *
  * This program is distributed in the hope that it will be useful,
@@ -20,31 +20,6 @@
 
 namespace HappyPrime\ThemeImageBlock;
 
-const VERSION = '0.0.1';
-
-/**
- * A common prefix used with settings pages, fields, sections, and other
- * components to help with uniquity.
- *
- * @var string
- */
-const PREFIX = 'hp-ti-';
-
-/**
- * A common slug combined with the prefix and used to build the names of
- * settings pages, fields, sections, and other components.
- *
- * @var string
- */
-const SLUG = 'theme-images-block';
-
-/**
- * The main option key used for the plugin.
- *
- * @var string
- */
-const OPTION_NAME = 'hp_theme_images_block';
-
 const BLOCKS_DIR = __DIR__ . '/blocks';
 
 // If this file is called directly, abort.
@@ -54,13 +29,15 @@ if ( ! defined( 'WPINC' ) ) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+add_action( 'plugins_loaded', [ Init::class, 'init' ] );
+
 /**
  * Register a theme image.
  *
  * This function can be used by themes and plugins to register images that
  * should be available for selection in the Theme Image block.
  *
- * @since 0.1.0
+ * @since 1.0.0
  *
  * @param string               $slug Unique identifier for the image.
  * @param array<string, mixed> $args {
@@ -88,7 +65,7 @@ function register_theme_image( string $slug, array $args ): bool {
  * This function can be used by themes and plugins to register styles that
  * control the dimensions of images in the Theme Image block.
  *
- * @since 0.1.0
+ * @since 1.0.0
  *
  * @param string               $slug Unique identifier for the style.
  * @param array<string, mixed> $args {
@@ -104,5 +81,3 @@ function register_theme_image( string $slug, array $args ): bool {
 function register_theme_image_style( string $slug, array $args ): bool {
 	return \HappyPrime\ThemeImageBlock\StyleRegistry::register( $slug, $args );
 }
-
-add_action( 'plugins_loaded', [ Init::class, 'init' ] );

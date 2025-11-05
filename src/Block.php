@@ -56,11 +56,10 @@ class Block {
 			$style_data = StyleRegistry::get( $style_slug );
 
 			if ( $style_data ) {
-				// Validate to prevent CSS injection by rejecting values with semicolons.
-				if ( ! empty( $style_data['width'] ) && false === strpos( $style_data['width'], ';' ) ) {
+				if ( ! empty( $style_data['width'] ) ) {
 					$width = esc_attr( $style_data['width'] );
 				}
-				if ( ! empty( $style_data['height'] ) && false === strpos( $style_data['height'], ';' ) ) {
+				if ( ! empty( $style_data['height'] ) ) {
 					$height = esc_attr( $style_data['height'] );
 				}
 			}
