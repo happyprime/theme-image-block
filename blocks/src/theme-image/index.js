@@ -372,7 +372,7 @@ function Edit({ attributes, setAttributes }) {
 							setAttributes({ imageStyle: value })
 						}
 						help={__(
-							'Select a registered style to apply image dimensions.',
+							'Select a registered style to apply.',
 							'happyprime'
 						)}
 					/>
@@ -385,7 +385,7 @@ function Edit({ attributes, setAttributes }) {
 								setAttributes({ inlineSVG: value })
 							}
 							help={__(
-								'Render SVG code inline for better styling control.',
+								'Render SVG code inline.',
 								'happyprime'
 							)}
 						/>
