@@ -171,7 +171,7 @@ function Edit({ attributes, setAttributes }) {
 	}
 
 	// Build content based on image type and link settings
-	// Structure matches server-side: <div><a?><svg|img></a?></div>
+	// Structure matches server-side: <figure><a?><svg|img></a?></figure>
 	let content;
 	if (!imageUrl) {
 		content = (
@@ -181,7 +181,7 @@ function Edit({ attributes, setAttributes }) {
 		);
 	} else if (inlineSVG && processedSvg) {
 		// For inline SVG, apply dangerouslySetInnerHTML to link or wrapper
-		// to match server-side structure without extra div wrapper
+		// to match server-side structure without extra figure wrapper
 		if (linkUrl) {
 			content = (
 				<a
@@ -192,7 +192,7 @@ function Edit({ attributes, setAttributes }) {
 				/>
 			);
 		} else {
-			// Will be applied to wrapper div via blockProps below
+			// Will be applied to wrapper figure via blockProps below
 			content = null;
 		}
 	} else {
@@ -390,7 +390,7 @@ function Edit({ attributes, setAttributes }) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div {...wrapperProps}>{content}</div>
+			<figure {...wrapperProps}>{content}</figure>
 		</>
 	);
 }
