@@ -53,7 +53,7 @@ function Edit({ attributes, setAttributes }) {
 
 	// Build the options array for the SelectControl.
 	const themeImages = [
-		{ value: '', label: __('Select an image', 'happyprime') },
+		{ value: '', label: __('Select an image', 'theme-image-block') },
 		...registeredImages.map((image) => ({
 			value: image.slug,
 			label: image.label,
@@ -67,7 +67,7 @@ function Edit({ attributes, setAttributes }) {
 
 	// Build size options from the current image's variations.
 	const sizeOptions = [
-		{ value: 'original', label: __('Original', 'happyprime') },
+		{ value: 'original', label: __('Original', 'theme-image-block') },
 	];
 
 	if (currentImage && currentImage.variations) {
@@ -177,10 +177,10 @@ function Edit({ attributes, setAttributes }) {
 		content = (
 			<Placeholder
 				icon={<BlockIcon icon={image} />}
-				label={__('Theme Image', 'happyprime')}
+				label={__('Theme Image', 'theme-image-block')}
 				instructions={__(
 					'Select an image from the block settings',
-					'happyprime'
+					'theme-image-block'
 				)}
 			/>
 		);
@@ -214,7 +214,7 @@ function Edit({ attributes, setAttributes }) {
 			<img
 				src={imageUrl}
 				alt={
-					currentImage?.alt || __('Theme image preview', 'happyprime')
+					currentImage?.alt || __('Theme image preview', 'theme-image-block')
 				}
 				style={
 					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
@@ -245,14 +245,14 @@ function Edit({ attributes, setAttributes }) {
 				<BlockControls group="block">
 					<ToolbarButton
 						icon="admin-links"
-						label={__('Link', 'happyprime')}
+						label={__('Link', 'theme-image-block')}
 						onClick={() => setIsEditingLink(true)}
 						isActive={!!linkUrl}
 					/>
 					{linkUrl && (
 						<ToolbarButton
 							icon="editor-unlink"
-							label={__('Unlink', 'happyprime')}
+							label={__('Unlink', 'theme-image-block')}
 							onClick={() => {
 								setAttributes({
 									linkUrl: '',
@@ -309,11 +309,11 @@ function Edit({ attributes, setAttributes }) {
 						settings={[
 							{
 								id: 'opensInNewTab',
-								title: __('Open in new tab', 'happyprime'),
+								title: __('Open in new tab', 'theme-image-block'),
 							},
 							{
 								id: 'nofollow',
-								title: __('Mark as nofollow', 'happyprime'),
+								title: __('Mark as nofollow', 'theme-image-block'),
 							},
 						]}
 					/>
@@ -322,11 +322,11 @@ function Edit({ attributes, setAttributes }) {
 
 			<InspectorControls>
 				<PanelBody
-					title={__('Settings', 'happyprime')}
+					title={__('Settings', 'theme-image-block')}
 					initialOpen={true}
 				>
 					<SelectControl
-						label={__('Theme Image', 'happyprime')}
+						label={__('Theme Image', 'theme-image-block')}
 						value={themeImage}
 						options={themeImages}
 						onChange={(value) => {
@@ -337,7 +337,7 @@ function Edit({ attributes, setAttributes }) {
 						}}
 						help={__(
 							'Select a registered theme image.',
-							'happyprime'
+							'theme-image-block'
 						)}
 					/>
 
@@ -345,7 +345,7 @@ function Edit({ attributes, setAttributes }) {
 						currentImage.variations &&
 						Object.keys(currentImage.variations).length > 0 && (
 							<SelectControl
-								label={__('Variation', 'happyprime')}
+								label={__('Variation', 'theme-image-block')}
 								value={imageSize}
 								options={sizeOptions}
 								onChange={(value) =>
@@ -353,16 +353,16 @@ function Edit({ attributes, setAttributes }) {
 								}
 								help={__(
 									'Select the image variation.',
-									'happyprime'
+									'theme-image-block'
 								)}
 							/>
 						)}
 
 					<SelectControl
-						label={__('Style', 'happyprime')}
+						label={__('Style', 'theme-image-block')}
 						value={imageStyle}
 						options={[
-							{ value: '', label: __('Default', 'happyprime') },
+							{ value: '', label: __('Default', 'theme-image-block') },
 							...registeredStyles.map((style) => ({
 								value: style.slug,
 								label: style.name,
@@ -373,20 +373,20 @@ function Edit({ attributes, setAttributes }) {
 						}
 						help={__(
 							'Select a registered style to apply.',
-							'happyprime'
+							'theme-image-block'
 						)}
 					/>
 
 					{isSVG && (
 						<ToggleControl
-							label={__('Inline SVG', 'happyprime')}
+							label={__('Inline SVG', 'theme-image-block')}
 							checked={inlineSVG}
 							onChange={(value) =>
 								setAttributes({ inlineSVG: value })
 							}
 							help={__(
 								'Render SVG code inline.',
-								'happyprime'
+								'theme-image-block'
 							)}
 						/>
 					)}

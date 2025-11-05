@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name:  Theme Images Block
+ * Plugin Name:  Theme Image Block
  * Description:  Use images from your theme as blocks in content.
  * Version:      0.0.1
  * Author:       Happy Prime
  * Author URI:   https://happyprime.co
  * License:      GPL-2.0-or-later
  * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:  happyprime
+ * Text Domain:  theme-image-block
  * Domain Path:  /languages
  *
  * This program is distributed in the hope that it will be useful,
