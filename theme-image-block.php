@@ -29,6 +29,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+add_action( 'plugins_loaded', [ Init::class, 'init' ] );
+
 /**
  * Register a theme image.
  *
@@ -79,5 +81,3 @@ function register_theme_image( string $slug, array $args ): bool {
 function register_theme_image_style( string $slug, array $args ): bool {
 	return \HappyPrime\ThemeImageBlock\StyleRegistry::register( $slug, $args );
 }
-
-add_action( 'plugins_loaded', [ Init::class, 'init' ] );
