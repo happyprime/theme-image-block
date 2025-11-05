@@ -5,6 +5,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	BlockControls,
+	BlockIcon,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { registerBlockType } from '@wordpress/blocks';
@@ -14,9 +15,11 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	Popover,
+	Placeholder,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { image } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -69,9 +72,11 @@ function Edit({ attributes, setAttributes }) {
 
 	if (currentImage && currentImage.variations) {
 		Object.keys(currentImage.variations).forEach((sizeKey) => {
-			// Convert size key to a readable label (e.g., 'large' -> 'Large')
-			const label = sizeKey.charAt(0).toUpperCase() + sizeKey.slice(1);
-			sizeOptions.push({ value: sizeKey, label });
+			const variation = currentImage.variations[sizeKey];
+			sizeOptions.push({
+				value: sizeKey,
+				label: variation.name || sizeKey,
+			});
 		});
 	}
 
@@ -97,9 +102,7 @@ function Edit({ attributes, setAttributes }) {
 			fetch(svgUrl)
 				.then((response) => response.text())
 				.then((svg) => {
-					// Remove XML declaration to match server-side processing.
-					const cleanedSvg = svg.replace(/^<\?xml\s+.*?\?>\s*/s, '');
-					setSvgContent(cleanedSvg);
+					setSvgContent(svg);
 				})
 				.catch((error) => {
 					console.error('Failed to fetch SVG:', error);
@@ -130,29 +133,28 @@ function Edit({ attributes, setAttributes }) {
 	// Process inline SVG if needed.
 	let processedSvg = null;
 	if (inlineSVG && svgContent) {
-		// Build styles array for editor preview
-		// Validate to prevent CSS injection by rejecting values with semicolons
+		// Build styles array for editor preview.
 		const styles = [];
-		if (width && !width.includes(';')) {
+		if (width) {
 			styles.push(`width: ${width}`);
 		} else if (!width) {
-			// Default width for editor preview when not specified
+			// Default width for editor preview when not specified.
 			styles.push('width: 100%');
 		}
-		if (height && !height.includes(';')) {
+		if (height) {
 			styles.push(`height: ${height}`);
 		}
 
 		const styleAttr = styles.join('; ');
 
-		// Insert or merge style attribute into the SVG tag
+		// Insert or merge style attribute into the SVG tag.
 		const svgMatch = svgContent.match(/<svg([^>]*)>/);
 		if (svgMatch) {
 			const existingAttrs = svgMatch[1];
 			const styleMatch = existingAttrs.match(/style="([^"]*)"/);
 
 			if (styleMatch) {
-				// Merge with existing style
+				// Merge with existing style.
 				const existingStyle = styleMatch[1];
 				processedSvg = svgContent.replace(/<svg([^>]*)>/, (match) =>
 					match.replace(
@@ -173,9 +175,14 @@ function Edit({ attributes, setAttributes }) {
 	let content;
 	if (!imageUrl) {
 		content = (
-			<div className="theme-image-placeholder">
-				{__('Select a theme image from the sidebar', 'happyprime')}
-			</div>
+			<Placeholder
+				icon={<BlockIcon icon={image} />}
+				label={__('Theme Image', 'happyprime')}
+				instructions={__(
+					'Select an image from the block settings',
+					'happyprime'
+				)}
+			/>
 		);
 	} else if (inlineSVG && processedSvg) {
 		// For inline SVG, apply dangerouslySetInnerHTML to link or wrapper
@@ -194,13 +201,12 @@ function Edit({ attributes, setAttributes }) {
 			content = null;
 		}
 	} else {
-		// Build inline styles for img element
-		// Validate to prevent CSS injection by rejecting values with semicolons
+		// Build inline styles for img element.
 		const imgStyles = {};
-		if (width && !width.includes(';')) {
+		if (width) {
 			imgStyles.width = width;
 		}
-		if (height && !height.includes(';')) {
+		if (height) {
 			imgStyles.height = height;
 		}
 

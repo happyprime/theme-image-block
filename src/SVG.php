@@ -45,12 +45,12 @@ class SVG {
 
 			$processor->set_attribute( 'focusable', 'false' );
 
-			// Apply width/height to SVG if set. Validate to prevent CSS injection.
+			// Apply width/height to SVG if set.
 			$inline_styles = array();
-			if ( $args['width'] && false === strpos( $args['width'], ';' ) ) {
+			if ( $args['width'] ) {
 				$inline_styles[] = 'width: ' . $args['width'];
 			}
-			if ( $args['height'] && false === strpos( $args['height'], ';' ) ) {
+			if ( $args['height'] ) {
 				$inline_styles[] = 'height: ' . $args['height'];
 			}
 			if ( ! empty( $inline_styles ) ) {
@@ -58,11 +58,6 @@ class SVG {
 			}
 		}
 
-		$svg = $processor->get_updated_html();
-
-		// Remove XML declaration if present at the start of the SVG.
-		$svg = preg_replace( '/^<\?xml\s+.*?\?>\s*/s', '', $svg );
-
-		return $svg ?? '';
+		return $processor->get_updated_html();
 	}
 }
