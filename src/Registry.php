@@ -18,6 +18,7 @@ class Registry {
 	 *     title: string,
 	 *     description: string,
 	 *     alt: string,
+	 *     caption: string,
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
@@ -39,6 +40,7 @@ class Registry {
 	 *     @type string $title       Display title for the image (required).
 	 *     @type string $description Description of the image (optional).
 	 *     @type string $alt         Default alt text for the image (optional).
+	 *     @type string $caption     Default caption for the image (optional).
 	 *     @type string $path        Path to the image file relative to the theme directory (required).
 	 *     @type string $width       Default width value (optional).
 	 *     @type string $height      Default height value (optional).
@@ -82,6 +84,7 @@ class Registry {
 			'title'       => '',
 			'description' => '',
 			'alt'         => '',
+			'caption'     => '',
 			'path'        => '',
 			'width'       => '',
 			'height'      => '',
@@ -98,6 +101,7 @@ class Registry {
 			'title'       => sanitize_text_field( $args['title'] ),
 			'description' => sanitize_text_field( $args['description'] ),
 			'alt'         => sanitize_text_field( $args['alt'] ),
+			'caption'     => sanitize_text_field( $args['caption'] ),
 			'path'        => sanitize_text_field( $args['path'] ),
 			'width'       => sanitize_text_field( $args['width'] ),
 			'height'      => sanitize_text_field( $args['height'] ),
@@ -117,6 +121,7 @@ class Registry {
 	 *     title: string,
 	 *     description: string,
 	 *     alt: string,
+	 *     caption: string,
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
@@ -139,6 +144,7 @@ class Registry {
 	 *     title: string,
 	 *     description: string,
 	 *     alt: string,
+	 *     caption: string,
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
@@ -200,6 +206,7 @@ class Registry {
 				'label'       => $data['title'],
 				'description' => $data['description'],
 				'alt'         => $data['alt'],
+				'caption'     => $data['caption'],
 				'width'       => $data['width'],
 				'height'      => $data['height'],
 				'max_width'   => $data['max_width'],

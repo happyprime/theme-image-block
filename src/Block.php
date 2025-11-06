@@ -22,6 +22,7 @@ class Block {
 	 *     @type string $linkUrl     URL for wrapping the image in a link. Default empty string.
 	 *     @type string $linkTarget  Target attribute for the link (e.g., '_blank'). Default empty string.
 	 *     @type string $linkRel     Rel attribute for the link (e.g., 'nofollow'). Default empty string.
+	 *     @type string $caption     Caption text to display below the image. Default empty string.
 	 * }
 	 * @param string                $content    Block content.
 	 *
@@ -196,6 +197,12 @@ class Block {
 		}
 
 		$content = $html->get_updated_html();
+
+		// Add caption if provided.
+		$caption = isset( $attributes['caption'] ) ? wp_kses_post( $attributes['caption'] ) : '';
+		if ( ! empty( $caption ) ) {
+			$content .= sprintf( '<figcaption>%s</figcaption>', $caption );
+		}
 
 		$wrapper_attrs = array( 'class' => implode( ' ', $wrapper_classes ) );
 

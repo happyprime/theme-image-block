@@ -45,6 +45,10 @@
 		"linkRel": {
 			"type": "string",
 			"default": ""
+		},
+		"caption": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"textdomain": "happyprime",

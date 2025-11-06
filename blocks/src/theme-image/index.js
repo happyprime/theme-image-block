@@ -7,6 +7,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	__experimentalLinkControl as LinkControl,
+	RichText,
 } from '@wordpress/block-editor';
 import { registerBlockType } from '@wordpress/blocks';
 import {
@@ -43,6 +44,7 @@ function Edit({ attributes, setAttributes }) {
 		linkUrl,
 		linkTarget,
 		linkRel,
+		caption,
 	} = attributes;
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
@@ -393,7 +395,18 @@ function Edit({ attributes, setAttributes }) {
 				</PanelBody>
 			</InspectorControls>
 
-			<figure {...wrapperProps}>{content}</figure>
+			<figure {...wrapperProps}>
+				{content}
+				{imageUrl && (
+					<RichText
+						tagName="figcaption"
+						placeholder={__('Add caption…', 'theme-image-block')}
+						value={caption}
+						onChange={(value) => setAttributes({ caption: value })}
+						allowedFormats={[]}
+					/>
+				)}
+			</figure>
 		</>
 	);
 }
