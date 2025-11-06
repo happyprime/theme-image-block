@@ -453,7 +453,11 @@ function Edit({ attributes, setAttributes }) {
 						}
 						value={caption}
 						onChange={(value) => setAttributes({ caption: value })}
-						allowedFormats={[]}
+						allowedFormats={[
+							'core/bold',
+							'core/italic',
+							'core/link',
+						]}
 					/>
 				)}
 			</figure>
