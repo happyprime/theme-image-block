@@ -21,6 +21,8 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
+	 *     max_width: string,
+	 *     max_height: string,
 	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }>
@@ -40,6 +42,8 @@ class Registry {
 	 *     @type string $path        Path to the image file relative to the theme directory (required).
 	 *     @type string $width       Default width value (optional).
 	 *     @type string $height      Default height value (optional).
+	 *     @type string $max_width   Max width to apply to the image element (optional).
+	 *     @type string $max_height  Max height to apply to the image element (optional).
 	 *     @type array  $variations  Array of image variations for srcset (optional).
 	 *     @type string $sizes       Value for the sizes attribute (optional).
 	 * }
@@ -81,6 +85,8 @@ class Registry {
 			'path'        => '',
 			'width'       => '',
 			'height'      => '',
+			'max_width'   => '',
+			'max_height'  => '',
 			'variations'  => array(),
 			'sizes'       => '',
 		);
@@ -95,6 +101,8 @@ class Registry {
 			'path'        => sanitize_text_field( $args['path'] ),
 			'width'       => sanitize_text_field( $args['width'] ),
 			'height'      => sanitize_text_field( $args['height'] ),
+			'max_width'   => sanitize_text_field( $args['max_width'] ),
+			'max_height'  => sanitize_text_field( $args['max_height'] ),
 			'variations'  => self::sanitize_variations( $args['variations'] ),
 			'sizes'       => sanitize_text_field( $args['sizes'] ),
 		);
@@ -112,6 +120,8 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
+	 *     max_width: string,
+	 *     max_height: string,
 	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }> Registered images, keyed by image slug.
@@ -132,6 +142,8 @@ class Registry {
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
+	 *     max_width: string,
+	 *     max_height: string,
 	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }|null Image data or null if not found.
@@ -190,6 +202,8 @@ class Registry {
 				'alt'         => $data['alt'],
 				'width'       => $data['width'],
 				'height'      => $data['height'],
+				'max_width'   => $data['max_width'],
+				'max_height'  => $data['max_height'],
 				'variations'  => $data['variations'],
 				'sizes'       => $data['sizes'],
 			);

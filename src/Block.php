@@ -134,6 +134,12 @@ class Block {
 		if ( $height ) {
 			$inline_styles[] = 'height: ' . $height;
 		}
+		if ( ! empty( $image_data['max_width'] ) ) {
+			$inline_styles[] = 'max-width: ' . esc_attr( $image_data['max_width'] );
+		}
+		if ( ! empty( $image_data['max_height'] ) ) {
+			$inline_styles[] = 'max-height: ' . esc_attr( $image_data['max_height'] );
+		}
 
 		$wrapper_classes = array();
 
@@ -144,9 +150,11 @@ class Block {
 			$content           = SVG::get(
 				$image_path,
 				[
-					'alt'    => $alt,
-					'width'  => $width,
-					'height' => $height,
+					'alt'        => $alt,
+					'width'      => $width,
+					'height'     => $height,
+					'max_width'  => ! empty( $image_data['max_width'] ) ? esc_attr( $image_data['max_width'] ) : '',
+					'max_height' => ! empty( $image_data['max_height'] ) ? esc_attr( $image_data['max_height'] ) : '',
 				]
 			);
 		} else {
