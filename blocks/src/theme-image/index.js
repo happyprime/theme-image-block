@@ -408,13 +408,13 @@ function Edit({ attributes, setAttributes }) {
 					)}
 
 					<ToggleControl
-						label={__('Omit alt text', 'theme-image-block')}
-						checked={omitAltText}
+						label={__('Display caption', 'theme-image-block')}
+						checked={showCaption}
 						onChange={(value) =>
-							setAttributes({ omitAltText: value })
+							setAttributes({ showCaption: value })
 						}
 						help={__(
-							'Output empty alt text, even if a registered value exists.',
+							'Show a caption below the image.',
 							'theme-image-block'
 						)}
 					/>
@@ -435,13 +435,13 @@ function Edit({ attributes, setAttributes }) {
 					)}
 
 					<ToggleControl
-						label={__('Display caption', 'theme-image-block')}
-						checked={showCaption}
+						label={__('Omit alt text', 'theme-image-block')}
+						checked={omitAltText}
 						onChange={(value) =>
-							setAttributes({ showCaption: value })
+							setAttributes({ omitAltText: value })
 						}
 						help={__(
-							'Show a caption below the image.',
+							'Output empty alt text, even if a registered value exists.',
 							'theme-image-block'
 						)}
 					/>
