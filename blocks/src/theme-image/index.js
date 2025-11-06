@@ -269,6 +269,12 @@ function Edit({ attributes, setAttributes }) {
 							}}
 						/>
 					)}
+					<ToolbarButton
+						icon="caption"
+						label={__('Add caption', 'theme-image-block')}
+						onClick={() => setAttributes({ showCaption: !showCaption })}
+						isActive={showCaption}
+					/>
 				</BlockControls>
 			)}
 
@@ -406,18 +412,6 @@ function Edit({ attributes, setAttributes }) {
 							)}
 						/>
 					)}
-
-					<ToggleControl
-						label={__('Display caption', 'theme-image-block')}
-						checked={showCaption}
-						onChange={(value) =>
-							setAttributes({ showCaption: value })
-						}
-						help={__(
-							'Show a caption below the image.',
-							'theme-image-block'
-						)}
-					/>
 
 					{!omitAltText && (
 						<TextControl
