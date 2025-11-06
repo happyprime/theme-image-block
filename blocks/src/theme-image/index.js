@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { image, caption } from '@wordpress/icons';
+import { image, caption as captionIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -270,7 +270,7 @@ function Edit({ attributes, setAttributes }) {
 						/>
 					)}
 					<ToolbarButton
-						icon={caption}
+						icon={captionIcon}
 						label={__('Add caption', 'theme-image-block')}
 						onClick={() => setAttributes({ showCaption: !showCaption })}
 						isActive={showCaption}
