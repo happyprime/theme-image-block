@@ -9,6 +9,7 @@
 	"description": "Display an image from the theme's images directory.",
 	"supports": {
 		"anchor": true,
+		"align": true,
 		"color": {
 			"text": false,
 			"background": false
