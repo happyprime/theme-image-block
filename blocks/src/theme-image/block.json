@@ -48,5 +48,6 @@
 		}
 	},
 	"textdomain": "happyprime",
-	"editorScript": "file:../../build/theme-image/index.js"
+	"editorScript": "file:../../build/theme-image/index.js",
+	"style": "file:./style.css"
 }
