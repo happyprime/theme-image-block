@@ -17,6 +17,7 @@ import {
 	ToolbarButton,
 	Popover,
 	Placeholder,
+	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
@@ -45,6 +46,9 @@ function Edit({ attributes, setAttributes }) {
 		linkTarget,
 		linkRel,
 		caption,
+		showCaption,
+		altText,
+		omitAltText,
 	} = attributes;
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
@@ -392,15 +396,53 @@ function Edit({ attributes, setAttributes }) {
 							)}
 						/>
 					)}
+
+					<TextControl
+						label={__('Alt Text', 'theme-image-block')}
+						value={altText}
+						onChange={(value) => setAttributes({ altText: value })}
+						placeholder={currentImage?.alt || ''}
+						help={__(
+							'Alternative text for the image. Leave empty to use the registered default.',
+							'theme-image-block'
+						)}
+					/>
+
+					<ToggleControl
+						label={__('Omit alt text', 'theme-image-block')}
+						checked={omitAltText}
+						onChange={(value) =>
+							setAttributes({ omitAltText: value })
+						}
+						help={__(
+							'Output empty alt text, even if a registered value exists.',
+							'theme-image-block'
+						)}
+					/>
+
+					<ToggleControl
+						label={__('Display caption', 'theme-image-block')}
+						checked={showCaption}
+						onChange={(value) =>
+							setAttributes({ showCaption: value })
+						}
+						help={__(
+							'Show a caption below the image.',
+							'theme-image-block'
+						)}
+					/>
 				</PanelBody>
 			</InspectorControls>
 
 			<figure {...wrapperProps}>
 				{content}
-				{imageUrl && (
+				{imageUrl && showCaption && (
 					<RichText
 						tagName="figcaption"
-						placeholder={__('Add caption…', 'theme-image-block')}
+						placeholder={
+							currentImage?.caption ||
+							__('Add caption…', 'theme-image-block')
+						}
 						value={caption}
 						onChange={(value) => setAttributes({ caption: value })}
 						allowedFormats={[]}

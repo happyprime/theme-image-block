@@ -23,6 +23,9 @@ class Block {
 	 *     @type string $linkTarget  Target attribute for the link (e.g., '_blank'). Default empty string.
 	 *     @type string $linkRel     Rel attribute for the link (e.g., 'nofollow'). Default empty string.
 	 *     @type string $caption     Caption text to display below the image. Default empty string.
+	 *     @type bool   $showCaption Whether to display the caption. Default false.
+	 *     @type string $altText     Custom alt text to override the registered default. Default empty string.
+	 *     @type bool   $omitAltText Whether to omit alt text entirely. Default false.
 	 * }
 	 * @param string                $content    Block content.
 	 *
@@ -42,7 +45,16 @@ class Block {
 			return '';
 		}
 
-		$alt         = esc_attr( $image_data['alt'] );
+		// Determine alt text based on omitAltText and altText attributes.
+		$omit_alt_text = isset( $attributes['omitAltText'] ) && $attributes['omitAltText'];
+		if ( $omit_alt_text ) {
+			$alt = '';
+		} elseif ( isset( $attributes['altText'] ) && ! empty( $attributes['altText'] ) ) {
+			$alt = esc_attr( $attributes['altText'] );
+		} else {
+			$alt = esc_attr( $image_data['alt'] );
+		}
+
 		$image_size  = isset( $attributes['imageSize'] ) ? sanitize_key( $attributes['imageSize'] ) : 'original';
 		$inline_svg  = isset( $attributes['inlineSVG'] ) && $attributes['inlineSVG'];
 		$link_url    = isset( $attributes['linkUrl'] ) ? esc_url( $attributes['linkUrl'] ) : '';
@@ -198,9 +210,10 @@ class Block {
 
 		$content = $html->get_updated_html();
 
-		// Add caption if provided.
-		$caption = isset( $attributes['caption'] ) ? wp_kses_post( $attributes['caption'] ) : '';
-		if ( ! empty( $caption ) ) {
+		// Add caption if showCaption is enabled and caption is provided.
+		$show_caption = isset( $attributes['showCaption'] ) && $attributes['showCaption'];
+		$caption      = isset( $attributes['caption'] ) ? wp_kses_post( $attributes['caption'] ) : '';
+		if ( $show_caption && ! empty( $caption ) ) {
 			$content .= sprintf( '<figcaption>%s</figcaption>', $caption );
 		}
 

@@ -50,6 +50,18 @@
 		"caption": {
 			"type": "string",
 			"default": ""
+		},
+		"showCaption": {
+			"type": "boolean",
+			"default": false
+		},
+		"altText": {
+			"type": "string",
+			"default": ""
+		},
+		"omitAltText": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"textdomain": "happyprime",
