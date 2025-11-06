@@ -15,7 +15,8 @@
 			"background": true
 		},
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		}
 	},
 	"attributes": {
