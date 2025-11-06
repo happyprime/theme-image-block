@@ -220,7 +220,8 @@ function Edit({ attributes, setAttributes }) {
 			<img
 				src={imageUrl}
 				alt={
-					currentImage?.alt || __('Theme image preview', 'theme-image-block')
+					currentImage?.alt ||
+					__('Theme image preview', 'theme-image-block')
 				}
 				style={
 					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
@@ -315,11 +316,17 @@ function Edit({ attributes, setAttributes }) {
 						settings={[
 							{
 								id: 'opensInNewTab',
-								title: __('Open in new tab', 'theme-image-block'),
+								title: __(
+									'Open in new tab',
+									'theme-image-block'
+								),
 							},
 							{
 								id: 'nofollow',
-								title: __('Mark as nofollow', 'theme-image-block'),
+								title: __(
+									'Mark as nofollow',
+									'theme-image-block'
+								),
 							},
 						]}
 					/>
@@ -368,7 +375,10 @@ function Edit({ attributes, setAttributes }) {
 						label={__('Style', 'theme-image-block')}
 						value={imageStyle}
 						options={[
-							{ value: '', label: __('Default', 'theme-image-block') },
+							{
+								value: '',
+								label: __('Default', 'theme-image-block'),
+							},
 							...registeredStyles.map((style) => ({
 								value: style.slug,
 								label: style.name,
@@ -397,17 +407,6 @@ function Edit({ attributes, setAttributes }) {
 						/>
 					)}
 
-					<TextControl
-						label={__('Alt Text', 'theme-image-block')}
-						value={altText}
-						onChange={(value) => setAttributes({ altText: value })}
-						placeholder={currentImage?.alt || ''}
-						help={__(
-							'Alternative text for the image. Leave empty to use the registered default.',
-							'theme-image-block'
-						)}
-					/>
-
 					<ToggleControl
 						label={__('Omit alt text', 'theme-image-block')}
 						checked={omitAltText}
@@ -419,6 +418,21 @@ function Edit({ attributes, setAttributes }) {
 							'theme-image-block'
 						)}
 					/>
+
+					{!omitAltText && (
+						<TextControl
+							label={__('Alt Text', 'theme-image-block')}
+							value={altText}
+							onChange={(value) =>
+								setAttributes({ altText: value })
+							}
+							placeholder={currentImage?.alt || ''}
+							help={__(
+								'Alternative text for the image. Leave empty to use the registered default.',
+								'theme-image-block'
+							)}
+						/>
+					)}
 
 					<ToggleControl
 						label={__('Display caption', 'theme-image-block')}
