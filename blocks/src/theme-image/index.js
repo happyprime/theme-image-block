@@ -7,6 +7,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	__experimentalLinkControl as LinkControl,
+	RichText,
 } from '@wordpress/block-editor';
 import { registerBlockType } from '@wordpress/blocks';
 import {
@@ -16,10 +17,11 @@ import {
 	ToolbarButton,
 	Popover,
 	Placeholder,
+	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { image } from '@wordpress/icons';
+import { image, caption as captionIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,6 +45,10 @@ function Edit({ attributes, setAttributes }) {
 		linkUrl,
 		linkTarget,
 		linkRel,
+		caption,
+		showCaption,
+		altText,
+		omitAltText,
 	} = attributes;
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
@@ -214,7 +220,8 @@ function Edit({ attributes, setAttributes }) {
 			<img
 				src={imageUrl}
 				alt={
-					currentImage?.alt || __('Theme image preview', 'theme-image-block')
+					currentImage?.alt ||
+					__('Theme image preview', 'theme-image-block')
 				}
 				style={
 					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
@@ -262,6 +269,12 @@ function Edit({ attributes, setAttributes }) {
 							}}
 						/>
 					)}
+					<ToolbarButton
+						icon={captionIcon}
+						label={__('Add caption', 'theme-image-block')}
+						onClick={() => setAttributes({ showCaption: !showCaption })}
+						isActive={showCaption}
+					/>
 				</BlockControls>
 			)}
 
@@ -309,11 +322,17 @@ function Edit({ attributes, setAttributes }) {
 						settings={[
 							{
 								id: 'opensInNewTab',
-								title: __('Open in new tab', 'theme-image-block'),
+								title: __(
+									'Open in new tab',
+									'theme-image-block'
+								),
 							},
 							{
 								id: 'nofollow',
-								title: __('Mark as nofollow', 'theme-image-block'),
+								title: __(
+									'Mark as nofollow',
+									'theme-image-block'
+								),
 							},
 						]}
 					/>
@@ -362,7 +381,10 @@ function Edit({ attributes, setAttributes }) {
 						label={__('Style', 'theme-image-block')}
 						value={imageStyle}
 						options={[
-							{ value: '', label: __('Default', 'theme-image-block') },
+							{
+								value: '',
+								label: __('Default', 'theme-image-block'),
+							},
 							...registeredStyles.map((style) => ({
 								value: style.slug,
 								label: style.name,
@@ -390,10 +412,55 @@ function Edit({ attributes, setAttributes }) {
 							)}
 						/>
 					)}
+
+					{!omitAltText && (
+						<TextControl
+							label={__('Alt Text', 'theme-image-block')}
+							value={altText}
+							onChange={(value) =>
+								setAttributes({ altText: value })
+							}
+							placeholder={currentImage?.alt || ''}
+							help={__(
+								'Alternative text for the image. Leave empty to use the registered default.',
+								'theme-image-block'
+							)}
+						/>
+					)}
+
+					<ToggleControl
+						label={__('Omit alt text', 'theme-image-block')}
+						checked={omitAltText}
+						onChange={(value) =>
+							setAttributes({ omitAltText: value })
+						}
+						help={__(
+							'Output empty alt text, even if a registered value exists.',
+							'theme-image-block'
+						)}
+					/>
 				</PanelBody>
 			</InspectorControls>
 
-			<figure {...wrapperProps}>{content}</figure>
+			<figure {...wrapperProps}>
+				{content}
+				{imageUrl && showCaption && (
+					<RichText
+						tagName="figcaption"
+						placeholder={
+							currentImage?.caption ||
+							__('Add caption…', 'theme-image-block')
+						}
+						value={caption}
+						onChange={(value) => setAttributes({ caption: value })}
+						allowedFormats={[
+							'core/bold',
+							'core/italic',
+							'core/link',
+						]}
+					/>
+				)}
+			</figure>
 		</>
 	);
 }

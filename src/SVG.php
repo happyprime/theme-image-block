@@ -26,9 +26,11 @@ class SVG {
 		}
 
 		$defaults = array(
-			'alt'    => '',
-			'width'  => '',
-			'height' => '',
+			'alt'        => '',
+			'width'      => '',
+			'height'     => '',
+			'max_width'  => '',
+			'max_height' => '',
 		);
 		$args     = wp_parse_args( $args, $defaults );
 
@@ -45,13 +47,19 @@ class SVG {
 
 			$processor->set_attribute( 'focusable', 'false' );
 
-			// Apply width/height to SVG if set.
+			// Apply width/height/max-width/max-height to SVG if set.
 			$inline_styles = array();
 			if ( $args['width'] ) {
 				$inline_styles[] = 'width: ' . $args['width'];
 			}
 			if ( $args['height'] ) {
 				$inline_styles[] = 'height: ' . $args['height'];
+			}
+			if ( $args['max_width'] ) {
+				$inline_styles[] = 'max-width: ' . $args['max_width'];
+			}
+			if ( $args['max_height'] ) {
+				$inline_styles[] = 'max-height: ' . $args['max_height'];
 			}
 			if ( ! empty( $inline_styles ) ) {
 				$processor->set_attribute( 'style', implode( '; ', $inline_styles ) );
