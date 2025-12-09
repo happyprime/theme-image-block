@@ -48,8 +48,8 @@ function Edit({ attributes, setAttributes }) {
 	const [isEditingLink, setIsEditingLink] = useState(false);
 
 	// Get registered theme images and styles from localized data.
-	const registeredImages = happyprimeData?.images || [];
-	const registeredStyles = happyprimeData?.styles || [];
+	const registeredImages = happyprime_themeimageblock_data?.images || [];
+	const registeredStyles = happyprime_themeimageblock_data?.styles || [];
 
 	// Build the options array for the SelectControl.
 	const themeImages = [
@@ -214,7 +214,8 @@ function Edit({ attributes, setAttributes }) {
 			<img
 				src={imageUrl}
 				alt={
-					currentImage?.alt || __('Theme image preview', 'theme-image-block')
+					currentImage?.alt ||
+					__('Theme image preview', 'theme-image-block')
 				}
 				style={
 					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
@@ -309,11 +310,17 @@ function Edit({ attributes, setAttributes }) {
 						settings={[
 							{
 								id: 'opensInNewTab',
-								title: __('Open in new tab', 'theme-image-block'),
+								title: __(
+									'Open in new tab',
+									'theme-image-block'
+								),
 							},
 							{
 								id: 'nofollow',
-								title: __('Mark as nofollow', 'theme-image-block'),
+								title: __(
+									'Mark as nofollow',
+									'theme-image-block'
+								),
 							},
 						]}
 					/>
@@ -362,7 +369,10 @@ function Edit({ attributes, setAttributes }) {
 						label={__('Style', 'theme-image-block')}
 						value={imageStyle}
 						options={[
-							{ value: '', label: __('Default', 'theme-image-block') },
+							{
+								value: '',
+								label: __('Default', 'theme-image-block'),
+							},
 							...registeredStyles.map((style) => ({
 								value: style.slug,
 								label: style.name,
