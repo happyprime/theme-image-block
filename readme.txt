@@ -3,7 +3,7 @@ Contributors: happyprime, jeremyfelt, slocker, philcable
 Tags: images, media
 Requires at least: 6.8
 Tested up to: 6.9
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 Requires PHP: 7.4
 
@@ -74,6 +74,10 @@ HappyPrime\ThemeImageBlock\register_theme_image_style(
 ```
 
 ## Changelog
+
+### 1.1.0
+
+* Initial release on wp.org.
 
 ### 1.0.0
 
