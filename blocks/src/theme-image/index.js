@@ -54,8 +54,8 @@ function Edit({ attributes, setAttributes }) {
 	const [isEditingLink, setIsEditingLink] = useState(false);
 
 	// Get registered theme images and styles from localized data.
-	const registeredImages = happyprimeData?.images || [];
-	const registeredStyles = happyprimeData?.styles || [];
+	const registeredImages = happyprime_themeimageblock_data?.images || [];
+	const registeredStyles = happyprime_themeimageblock_data?.styles || [];
 
 	// Build the options array for the SelectControl.
 	const themeImages = [

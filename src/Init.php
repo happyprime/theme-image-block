@@ -41,7 +41,7 @@ class Init {
 			// Pass theme URL, registered images, and styles to JavaScript.
 			wp_localize_script(
 				$script_handle,
-				'happyprimeData',
+				'happyprime_themeimageblock_data',
 				array(
 					'themeUrl' => get_template_directory_uri(),
 					'images'   => Registry::get_for_editor(),

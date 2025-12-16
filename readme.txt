@@ -2,8 +2,8 @@
 Contributors: happyprime, jeremyfelt, slocker, philcable
 Tags: images, media
 Requires at least: 6.8
-Tested up to: 6.8
-Stable tag: 1.0.0
+Tested up to: 6.9
+Stable tag: 1.0.1
 License: GPLv2 or later
 Requires PHP: 7.4
 
