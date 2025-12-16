@@ -18,9 +18,12 @@ class Registry {
 	 *     title: string,
 	 *     description: string,
 	 *     alt: string,
+	 *     caption: string,
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
+	 *     max_width: string,
+	 *     max_height: string,
 	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }>
@@ -37,9 +40,12 @@ class Registry {
 	 *     @type string $title       Display title for the image (required).
 	 *     @type string $description Description of the image (optional).
 	 *     @type string $alt         Default alt text for the image (optional).
+	 *     @type string $caption     Default caption for the image (optional).
 	 *     @type string $path        Path to the image file relative to the theme directory (required).
 	 *     @type string $width       Default width value (optional).
 	 *     @type string $height      Default height value (optional).
+	 *     @type string $max_width   Max width to apply to the image element (optional).
+	 *     @type string $max_height  Max height to apply to the image element (optional).
 	 *     @type array  $variations  Array of image variations for srcset (optional).
 	 *     @type string $sizes       Value for the sizes attribute (optional).
 	 * }
@@ -78,9 +84,12 @@ class Registry {
 			'title'       => '',
 			'description' => '',
 			'alt'         => '',
+			'caption'     => '',
 			'path'        => '',
 			'width'       => '',
 			'height'      => '',
+			'max_width'   => '',
+			'max_height'  => '',
 			'variations'  => array(),
 			'sizes'       => '',
 		);
@@ -92,9 +101,12 @@ class Registry {
 			'title'       => sanitize_text_field( $args['title'] ),
 			'description' => sanitize_text_field( $args['description'] ),
 			'alt'         => sanitize_text_field( $args['alt'] ),
+			'caption'     => sanitize_text_field( $args['caption'] ),
 			'path'        => sanitize_text_field( $args['path'] ),
 			'width'       => sanitize_text_field( $args['width'] ),
 			'height'      => sanitize_text_field( $args['height'] ),
+			'max_width'   => sanitize_text_field( $args['max_width'] ),
+			'max_height'  => sanitize_text_field( $args['max_height'] ),
 			'variations'  => self::sanitize_variations( $args['variations'] ),
 			'sizes'       => sanitize_text_field( $args['sizes'] ),
 		);
@@ -109,9 +121,12 @@ class Registry {
 	 *     title: string,
 	 *     description: string,
 	 *     alt: string,
+	 *     caption: string,
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
+	 *     max_width: string,
+	 *     max_height: string,
 	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }> Registered images, keyed by image slug.
@@ -129,9 +144,12 @@ class Registry {
 	 *     title: string,
 	 *     description: string,
 	 *     alt: string,
+	 *     caption: string,
 	 *     path: string,
 	 *     width: string,
 	 *     height: string,
+	 *     max_width: string,
+	 *     max_height: string,
 	 *     variations: array<string, array{name: string, path: string, width: string, height: string}>,
 	 *     sizes: string
 	 * }|null Image data or null if not found.
@@ -188,8 +206,11 @@ class Registry {
 				'label'       => $data['title'],
 				'description' => $data['description'],
 				'alt'         => $data['alt'],
+				'caption'     => $data['caption'],
 				'width'       => $data['width'],
 				'height'      => $data['height'],
+				'max_width'   => $data['max_width'],
+				'max_height'  => $data['max_height'],
 				'variations'  => $data['variations'],
 				'sizes'       => $data['sizes'],
 			);

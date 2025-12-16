@@ -9,12 +9,14 @@
 	"description": "Display an image from the theme's images directory.",
 	"supports": {
 		"anchor": true,
+		"align": true,
 		"color": {
-			"text": false,
-			"background": false
+			"text": true,
+			"background": true
 		},
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		}
 	},
 	"attributes": {
@@ -45,8 +47,25 @@
 		"linkRel": {
 			"type": "string",
 			"default": ""
+		},
+		"caption": {
+			"type": "string",
+			"default": ""
+		},
+		"showCaption": {
+			"type": "boolean",
+			"default": false
+		},
+		"altText": {
+			"type": "string",
+			"default": ""
+		},
+		"omitAltText": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"textdomain": "happyprime",
-	"editorScript": "file:../../build/theme-image/index.js"
+	"editorScript": "file:../../build/theme-image/index.js",
+	"style": "file:./style.css"
 }
