@@ -26,7 +26,7 @@ The Theme Image Block plugin allows you to register images from your theme and m
 
 Theme images should be registered using `HappyPrime\ThemeImageBlock\register_theme_image()`. This is likely best done on the `init` or `after_setup_theme` action.
 
-```php
+<pre><code>
 HappyPrime\ThemeImageBlock\register_theme_image(
 	'happy-prime-logo',
 	[
@@ -56,13 +56,13 @@ HappyPrime\ThemeImageBlock\register_theme_image(
 		'sizes' => '(max-width: 600px) 100vw, 300px',
 	]
 );
-```
+</code></pre>
 
 ### Registering Theme Image Styles
 
 Theme image styles should be registered using `HappyPrime\ThemeImageBlock\register_theme_image_style()`. This is likely best done on the `init` or `after_setup_theme` action.
 
-```php
+<pre><code>
 HappyPrime\ThemeImageBlock\register_theme_image_style(
 	'hero',
 	[
@@ -71,7 +71,7 @@ HappyPrime\ThemeImageBlock\register_theme_image_style(
 		'height' => 'auto',
 	]
 );
-```
+</code></pre>
 
 ## Changelog
 
