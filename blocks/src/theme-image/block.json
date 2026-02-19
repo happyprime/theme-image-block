@@ -65,7 +65,7 @@
 			"default": false
 		}
 	},
-	"textdomain": "happyprime",
+	"textdomain": "theme-image-block",
 	"editorScript": "file:../../build/theme-image/index.js",
 	"style": "file:./style.css"
 }

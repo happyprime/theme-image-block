@@ -20,7 +20,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { image, caption as captionIcon } from '@wordpress/icons';
 
 /**
@@ -52,6 +52,7 @@ function Edit({ attributes, setAttributes }) {
 	} = attributes;
 	const [svgContent, setSvgContent] = useState(null);
 	const [isEditingLink, setIsEditingLink] = useState(false);
+	const blockRef = useRef();
 
 	// Get registered theme images and styles from localized data.
 	const registeredImages = happyprime_themeimageblock_data?.images || [];
@@ -104,7 +105,7 @@ function Edit({ attributes, setAttributes }) {
 			imagePath &&
 			imagePath.toLowerCase().endsWith('.svg')
 		) {
-			const svgUrl = `${happyprimeData.themeUrl}/${imagePath}`;
+			const svgUrl = `${happyprime_themeimageblock_data.themeUrl}/${imagePath}`;
 			fetch(svgUrl)
 				.then((response) => response.text())
 				.then((svg) => {
@@ -120,12 +121,13 @@ function Edit({ attributes, setAttributes }) {
 	}, [inlineSVG, imagePath]);
 
 	const blockProps = useBlockProps({
+		ref: blockRef,
 		className: inlineSVG ? 'has-inline-svg' : '',
 	});
 
 	const imageUrl =
-		imagePath && happyprimeData?.themeUrl
-			? `${happyprimeData.themeUrl}/${imagePath}`
+		imagePath && happyprime_themeimageblock_data?.themeUrl
+			? `${happyprime_themeimageblock_data.themeUrl}/${imagePath}`
 			: '';
 	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
@@ -143,9 +145,6 @@ function Edit({ attributes, setAttributes }) {
 		const styles = [];
 		if (width) {
 			styles.push(`width: ${width}`);
-		} else if (!width) {
-			// Default width for editor preview when not specified.
-			styles.push('width: 100%');
 		}
 		if (height) {
 			styles.push(`height: ${height}`);
@@ -216,13 +215,14 @@ function Edit({ attributes, setAttributes }) {
 			imgStyles.height = height;
 		}
 
+		const editorAlt = omitAltText
+			? ''
+			: altText || currentImage?.alt || '';
+
 		const img = (
 			<img
 				src={imageUrl}
-				alt={
-					currentImage?.alt ||
-					__('Theme image preview', 'theme-image-block')
-				}
+				alt={editorAlt}
 				style={
 					Object.keys(imgStyles).length > 0 ? imgStyles : undefined
 				}
@@ -282,9 +282,7 @@ function Edit({ attributes, setAttributes }) {
 				<Popover
 					position="bottom center"
 					onClose={() => setIsEditingLink(false)}
-					anchor={document.querySelector(
-						'.wp-block-happyprime-theme-image'
-					)}
+					anchor={blockRef.current}
 				>
 					<LinkControl
 						value={{
