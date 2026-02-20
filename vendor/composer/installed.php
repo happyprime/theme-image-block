@@ -3,7 +3,7 @@
         'name' => 'happyprime/theme-image-block',
         'pretty_version' => 'dev-trunk',
         'version' => 'dev-trunk',
-        'reference' => '746570aaffbaed4883dcc8f2ac9398af6eeba7ce',
+        'reference' => '531cc101b613bdc204e82d8c0f93797e63680158',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'happyprime/theme-image-block' => array(
             'pretty_version' => 'dev-trunk',
             'version' => 'dev-trunk',
-            'reference' => '746570aaffbaed4883dcc8f2ac9398af6eeba7ce',
+            'reference' => '531cc101b613bdc204e82d8c0f93797e63680158',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
