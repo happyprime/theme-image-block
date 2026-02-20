@@ -217,9 +217,7 @@ function Edit({ attributes, setAttributes }) {
 			imgStyles.height = height;
 		}
 
-		const editorAlt = omitAltText
-			? ''
-			: altText || currentImage?.alt || '';
+		const editorAlt = omitAltText ? '' : altText || currentImage?.alt || '';
 
 		const img = (
 			<img
@@ -267,7 +265,9 @@ function Edit({ attributes, setAttributes }) {
 					<ToolbarButton
 						icon={captionIcon}
 						label={__('Add caption', 'theme-image-block')}
-						onClick={() => setAttributes({ showCaption: !showCaption })}
+						onClick={() =>
+							setAttributes({ showCaption: !showCaption })
+						}
 						isActive={showCaption}
 					/>
 				</BlockControls>
