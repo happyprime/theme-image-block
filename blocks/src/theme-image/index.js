@@ -192,18 +192,20 @@ function Edit({ attributes, setAttributes }) {
 	} else if (inlineSVG && processedSvg) {
 		// For inline SVG, apply dangerouslySetInnerHTML to link or wrapper
 		// to match server-side structure without extra figure wrapper.
+		const svgElement = (
+			<span
+				dangerouslySetInnerHTML={{ __html: processedSvg }}
+				style={{ display: 'contents' }}
+			/>
+		);
 		if (linkUrl) {
 			content = (
-				<a
-					href={linkUrl}
-					target={linkTarget}
-					rel={linkRel}
-					dangerouslySetInnerHTML={{ __html: processedSvg }}
-				/>
+				<a href={linkUrl} target={linkTarget} rel={linkRel}>
+					{svgElement}
+				</a>
 			);
 		} else {
-			// Will be applied to wrapper figure via blockProps below.
-			content = null;
+			content = svgElement;
 		}
 	} else {
 		// Build inline styles for img element.
@@ -237,14 +239,7 @@ function Edit({ attributes, setAttributes }) {
 		);
 	}
 
-	// For inline SVG without link, apply HTML directly to wrapper.
-	const wrapperProps =
-		inlineSVG && processedSvg && !linkUrl
-			? {
-					...blockProps,
-					dangerouslySetInnerHTML: { __html: processedSvg },
-				}
-			: blockProps;
+	const wrapperProps = blockProps;
 
 	return (
 		<>
