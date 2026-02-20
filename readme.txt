@@ -3,7 +3,7 @@ Contributors: happyprime, jeremyfelt, slocker, philcable
 Tags: images, media
 Requires at least: 6.8
 Tested up to: 6.9
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 Requires PHP: 7.4
 
@@ -74,6 +74,14 @@ HappyPrime\ThemeImageBlock\register_theme_image_style(
 </code></pre>
 
 ## Changelog
+
+### 1.1.1
+
+* Prevent fatal error on activation.
+* Improve HTML processing when rendering output.
+* Fix reference to renamed global JavaScript variable.
+* Fix textdomain mismatch.
+* Improve support for multiple theme image blocks in one editor view.
 
 ### 1.1.0
 
