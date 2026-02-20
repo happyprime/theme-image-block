@@ -180,21 +180,22 @@ class Block {
 
 		if ( $link_url ) {
 			$content = '<a>' . $content . '</a>';
+
+			$html = new \WP_HTML_Tag_Processor( $content );
+			if ( $html->next_tag( array( 'tag_name' => 'a' ) ) ) {
+				$html->set_attribute( 'href', $link_url );
+				if ( $link_target ) {
+					$html->set_attribute( 'target', $link_target );
+				}
+				if ( $link_rel ) {
+					$html->set_attribute( 'rel', $link_rel );
+				}
+			}
+
+			$content = $html->get_updated_html();
 		}
 
 		$html = new \WP_HTML_Tag_Processor( $content );
-		if ( $html->next_tag( array( 'tag_name' => 'a' ) ) ) {
-			$html->set_attribute( 'href', $link_url );
-			if ( $link_target ) {
-				$html->set_attribute( 'target', $link_target );
-			}
-			if ( $link_rel ) {
-				$html->set_attribute( 'rel', $link_rel );
-			}
-		}
-
-		// This seems to be the best way to rewind and seek again? Seems strange.
-		$html = new \WP_HTML_Tag_Processor( $html->get_updated_html() );
 
 		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) ) {
 			if ( ! empty( $inline_styles ) ) {
@@ -217,7 +218,9 @@ class Block {
 			$content .= sprintf( '<figcaption>%s</figcaption>', $caption );
 		}
 
-		$wrapper_attrs = array( 'class' => implode( ' ', $wrapper_classes ) );
+		$wrapper_attrs = ! empty( $wrapper_classes )
+			? array( 'class' => implode( ' ', $wrapper_classes ) )
+			: array();
 
 		return sprintf(
 			'<figure %s>%s</figure>',
