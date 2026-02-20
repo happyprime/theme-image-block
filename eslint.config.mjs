@@ -1,1 +1,3 @@
-module.exports = require('@happyprime/eslint-config');
+import happyprimeConfig from '@happyprime/eslint-config';
+
+export default happyprimeConfig;
