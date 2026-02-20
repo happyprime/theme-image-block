@@ -2,7 +2,7 @@
 /**
  * Plugin Name:  Theme Image Block
  * Description:  Use images from your theme as blocks in content.
- * Version:      1.1.0
+ * Version:      1.1.1
  * Author:       Happy Prime
  * Author URI:   https://happyprime.co
  * License:      GPL-2.0-or-later
