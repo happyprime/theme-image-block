@@ -8,7 +8,7 @@ tests/
 .browserslistrc
 .distignore
 .editorconfig
-.eslintrc.js
+eslint.config.mjs
 .gitignore
 .phpunit.result.cache
 .prettierrc.js
