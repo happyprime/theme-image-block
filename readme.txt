@@ -13,6 +13,11 @@ Use images from your theme as blocks in content.
 
 The Theme Image Block plugin allows you to register images from your theme and make them available as blocks in the WordPress editor. This is useful for logos, icons, and other images that are part of your theme's design system.
 
+Two blocks are provided:
+
+* **Theme Image** — inserts a registered theme image inline.
+* **Theme Cover** — uses a registered theme image as the background of a cover area with an overlay and inner content, similar to the core Cover block.
+
 ## Installation
 
 1. Install and activate the plugin.
@@ -74,6 +79,10 @@ HappyPrime\ThemeImageBlock\register_theme_image_style(
 </code></pre>
 
 ## Changelog
+
+### 1.2.0
+
+* Add the Theme Cover block, which uses a registered theme image as the background of a cover area with an overlay, focal point, minimum height, and inner content support.
 
 ### 1.1.1
 

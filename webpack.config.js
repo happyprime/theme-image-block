@@ -10,6 +10,11 @@ module.exports = {
 			'blocks/src/theme-image',
 			'index.js'
 		),
+		'theme-cover/index': path.resolve(
+			__dirname,
+			'blocks/src/theme-cover',
+			'index.js'
+		),
 	},
 	output: {
 		path: path.resolve(__dirname, 'blocks/build'),
