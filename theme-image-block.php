@@ -22,9 +22,8 @@ namespace HappyPrime\ThemeImageBlock;
 
 const BLOCKS_DIR = __DIR__ . '/blocks';
 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
