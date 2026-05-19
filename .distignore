@@ -12,6 +12,7 @@ eslint.config.mjs
 .gitignore
 .phpunit.result.cache
 .prettierrc.js
+.wp-env.json
 composer.lock
 package-lock.json
 package.json
