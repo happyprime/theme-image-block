@@ -7,6 +7,10 @@
 
 namespace HappyPrime\ThemeImageBlock;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Initialize the plugin.
  */
