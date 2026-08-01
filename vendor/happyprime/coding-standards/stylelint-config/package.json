@@ -1,0 +1,19 @@
+{
+  "name": "@happyprime/stylelint-config",
+  "version": "0.0.6",
+  "description": "",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "keywords": [],
+  "author": "happyprime",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
+  "peerDependencies": {
+    "stylelint": "^16.19.1"
+  }
+}
