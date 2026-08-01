@@ -18,6 +18,6 @@ permissions:
 
 jobs:
   call-workflow:
-    uses: happyprime/workflows/.github/workflows/js-checks.yml@trunk
+    uses: happyprime/workflows/.github/workflows/js-checks.yml@feature/lint-js-preference-and-package-json-annotations
     with:
       node-version: 24
