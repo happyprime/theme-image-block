@@ -45,21 +45,21 @@ class Block {
 			return '';
 		}
 
-		// Determine alt text based on omitAltText and altText attributes.
+		// Kept raw: the img sprintf and set_attribute() each escape once.
 		$omit_alt_text = isset( $attributes['omitAltText'] ) && $attributes['omitAltText'];
 		if ( $omit_alt_text ) {
 			$alt = '';
 		} elseif ( isset( $attributes['altText'] ) && ! empty( $attributes['altText'] ) ) {
-			$alt = esc_attr( $attributes['altText'] );
+			$alt = $attributes['altText'];
 		} else {
-			$alt = esc_attr( $image_data['alt'] );
+			$alt = $image_data['alt'];
 		}
 
 		$image_size  = isset( $attributes['imageSize'] ) ? sanitize_key( $attributes['imageSize'] ) : 'original';
 		$inline_svg  = isset( $attributes['inlineSVG'] ) && $attributes['inlineSVG'];
 		$link_url    = isset( $attributes['linkUrl'] ) ? esc_url( $attributes['linkUrl'] ) : '';
-		$link_target = isset( $attributes['linkTarget'] ) ? esc_attr( $attributes['linkTarget'] ) : '';
-		$link_rel    = isset( $attributes['linkRel'] ) ? esc_attr( $attributes['linkRel'] ) : '';
+		$link_target = isset( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '';
+		$link_rel    = isset( $attributes['linkRel'] ) ? $attributes['linkRel'] : '';
 
 		// Get width/height from registered style if imageStyle is set.
 		$width  = '';
@@ -70,10 +70,10 @@ class Block {
 
 			if ( $style_data ) {
 				if ( ! empty( $style_data['width'] ) ) {
-					$width = esc_attr( $style_data['width'] );
+					$width = $style_data['width'];
 				}
 				if ( ! empty( $style_data['height'] ) ) {
-					$height = esc_attr( $style_data['height'] );
+					$height = $style_data['height'];
 				}
 			}
 		}
@@ -105,7 +105,7 @@ class Block {
 			if ( null === $max_width || $original_width <= $max_width ) {
 				$srcset_parts[] = sprintf(
 					'%s %sw',
-					esc_url( get_template_directory_uri() . '/' . $image_data['path'] ),
+					sanitize_url( get_template_directory_uri() . '/' . $image_data['path'] ),
 					$original_width
 				);
 			}
@@ -119,7 +119,7 @@ class Block {
 					if ( null === $max_width || $variation_width <= $max_width ) {
 						$srcset_parts[] = sprintf(
 							'%s %sw',
-							esc_url( get_template_directory_uri() . '/' . $variation['path'] ),
+							sanitize_url( get_template_directory_uri() . '/' . $variation['path'] ),
 							$variation_width
 						);
 					}
@@ -128,7 +128,7 @@ class Block {
 		}
 
 		$srcset = ! empty( $srcset_parts ) ? implode( ', ', $srcset_parts ) : '';
-		$sizes  = ! empty( $image_data['sizes'] ) ? esc_attr( $image_data['sizes'] ) : '';
+		$sizes  = ! empty( $image_data['sizes'] ) ? $image_data['sizes'] : '';
 
 		// Construct the image path from the display path.
 		$image_path = realpath( get_template_directory() . '/' . $display_path );
@@ -148,10 +148,10 @@ class Block {
 			$inline_styles[] = 'height: ' . $height;
 		}
 		if ( ! empty( $image_data['max_width'] ) ) {
-			$inline_styles[] = 'max-width: ' . esc_attr( $image_data['max_width'] );
+			$inline_styles[] = 'max-width: ' . $image_data['max_width'];
 		}
 		if ( ! empty( $image_data['max_height'] ) ) {
-			$inline_styles[] = 'max-height: ' . esc_attr( $image_data['max_height'] );
+			$inline_styles[] = 'max-height: ' . $image_data['max_height'];
 		}
 
 		$wrapper_classes = array();
@@ -166,15 +166,15 @@ class Block {
 					'alt'        => $alt,
 					'width'      => $width,
 					'height'     => $height,
-					'max_width'  => ! empty( $image_data['max_width'] ) ? esc_attr( $image_data['max_width'] ) : '',
-					'max_height' => ! empty( $image_data['max_height'] ) ? esc_attr( $image_data['max_height'] ) : '',
+					'max_width'  => $image_data['max_width'],
+					'max_height' => $image_data['max_height'],
 				]
 			);
 		} else {
 			$content = sprintf(
 				'<img src="%s" alt="%s" />',
 				esc_url( get_template_directory_uri() . '/' . $display_path ),
-				$alt,
+				esc_attr( $alt )
 			);
 		}
 

@@ -154,10 +154,6 @@ test.describe( 'SVG', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'C1: Block::render pre-escapes alt with esc_attr() and WordPress 7.1 set_attribute() escapes again, so aria-label reads "Tom&#039;s &quot;logo&quot; &amp; co".'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'flag', inlineSVG: true, altText: IMAGES.exported.alt },
