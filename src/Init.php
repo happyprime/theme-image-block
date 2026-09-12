@@ -24,7 +24,7 @@ class Init {
 	}
 
 	/**
-	 * Register the theme image block.
+	 * Registers the theme image block from the built block.json.
 	 */
 	public static function register_block(): void {
 		register_block_type_from_metadata(

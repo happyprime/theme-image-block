@@ -23,7 +23,7 @@ class StyleRegistry {
 	private static array $styles = array();
 
 	/**
-	 * Register a theme image style.
+	 * Registers a theme image style.
 	 *
 	 * @param string               $slug Unique identifier for the style.
 	 * @param array<string, mixed> $args {

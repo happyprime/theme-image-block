@@ -15,7 +15,7 @@ namespace HappyPrime\ThemeImageBlock;
  */
 class Block {
 	/**
-	 * Render the theme image block.
+	 * Renders the theme image block.
 	 *
 	 * @param array<string, mixed> $attributes Block attributes. {
 	 *     @type string $themeImage  The slug of the theme image to display. Required.

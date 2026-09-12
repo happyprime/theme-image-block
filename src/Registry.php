@@ -31,7 +31,7 @@ class Registry {
 	private static array $images = array();
 
 	/**
-	 * Register a theme image.
+	 * Registers a theme image.
 	 *
 	 * @param string               $slug  Unique identifier for the image.
 	 * @param array<string, mixed> $args  {
@@ -41,9 +41,9 @@ class Registry {
 	 *     @type string $description Description of the image (optional).
 	 *     @type string $alt         Default alt text for the image (optional).
 	 *     @type string $caption     Default caption for the image (optional).
-	 *     @type string $path        Path to the image file relative to the theme directory (required).
-	 *     @type string $width       Default width value (optional).
-	 *     @type string $height      Default height value (optional).
+	 *     @type string $path        Path to the image file relative to the parent theme directory (required).
+	 *     @type string $width       Pixel width of the file (optional).
+	 *     @type string $height      Pixel height of the file (optional).
 	 *     @type string $max_width   Max width to apply to the image element (optional).
 	 *     @type string $max_height  Max height to apply to the image element (optional).
 	 *     @type array  $variations  Array of image variations for srcset (optional).
