@@ -9,6 +9,8 @@ namespace HappyPrime\ThemeImageBlock;
 
 /**
  * Render the theme image block.
+ *
+ * @phpstan-type Image_Data array{path: string, width: string, variations: array<string, array{path: string, width: string}>}
  */
 class Block {
 	/**
@@ -87,48 +89,14 @@ class Block {
 			$display_path = $image_data['variations'][ $image_size ]['path'];
 		}
 
-		// Determine the maximum width for srcset based on selected size.
-		$max_width = null;
-		if (
-			'original' !== $image_size &&
-			! empty( $image_data['variations'][ $image_size ]['width'] )
-		) {
-			$max_width = (int) $image_data['variations'][ $image_size ]['width'];
-		}
+		// By extension: fileinfo is optional in PHP and libmagic misreads
+		// exports that open with a comment.
+		$filetype = wp_check_filetype( $display_path, array( 'svg' => 'image/svg+xml' ) );
+		$is_svg   = 'image/svg+xml' === $filetype['type'];
 
-		// Build srcset from registered variations.
-		$srcset_parts = array();
-
-		// Add the main image if it has a width and is within the size limit.
-		if ( ! empty( $image_data['width'] ) ) {
-			$original_width = (int) $image_data['width'];
-			if ( null === $max_width || $original_width <= $max_width ) {
-				$srcset_parts[] = sprintf(
-					'%s %sw',
-					sanitize_url( get_template_directory_uri() . '/' . $image_data['path'] ),
-					$original_width
-				);
-			}
-		}
-
-		// Add variations if they have width and path and are within the size limit.
-		if ( ! empty( $image_data['variations'] ) && is_array( $image_data['variations'] ) ) {
-			foreach ( $image_data['variations'] as $variation ) {
-				if ( ! empty( $variation['width'] ) && ! empty( $variation['path'] ) ) {
-					$variation_width = (int) $variation['width'];
-					if ( null === $max_width || $variation_width <= $max_width ) {
-						$srcset_parts[] = sprintf(
-							'%s %sw',
-							sanitize_url( get_template_directory_uri() . '/' . $variation['path'] ),
-							$variation_width
-						);
-					}
-				}
-			}
-		}
-
-		$srcset = ! empty( $srcset_parts ) ? implode( ', ', $srcset_parts ) : '';
-		$sizes  = ! empty( $image_data['sizes'] ) ? $image_data['sizes'] : '';
+		$theme_uri = get_template_directory_uri();
+		$srcset    = $is_svg ? '' : self::srcset( $image_data, $image_size, $theme_uri );
+		$sizes     = '' !== $srcset ? $image_data['sizes'] : '';
 
 		// Construct the image path from the display path.
 		$image_path = realpath( get_template_directory() . '/' . $display_path );
@@ -154,13 +122,9 @@ class Block {
 		}
 
 		$wrapper_classes = array();
+		$content         = '';
 
-		// By extension: fileinfo is optional in PHP and libmagic misreads
-		// exports that open with a comment.
-		$filetype = wp_check_filetype( $image_path, array( 'svg' => 'image/svg+xml' ) );
-		$content  = '';
-
-		if ( $inline_svg && 'image/svg+xml' === $filetype['type'] ) {
+		if ( $inline_svg && $is_svg ) {
 			$content = SVG::get(
 				$image_path,
 				[
@@ -180,7 +144,7 @@ class Block {
 		} else {
 			$content = sprintf(
 				'<img src="%s" alt="%s" />',
-				esc_url( get_template_directory_uri() . '/' . $display_path ),
+				esc_url( self::file_url( $theme_uri, $display_path ) ),
 				esc_attr( $alt )
 			);
 		}
@@ -234,5 +198,73 @@ class Block {
 			get_block_wrapper_attributes( $wrapper_attrs ),
 			$content
 		);
+	}
+
+	/**
+	 * Builds the srcset for a registered image, capped at the selected variation's width.
+	 *
+	 * Only a positive integer width makes a candidate. A selected variation
+	 * without one yields no srcset at all, so the browser keeps the chosen src.
+	 *
+	 * @param Image_Data $image_data Registered image.
+	 * @param string     $image_size Selected variation key, or 'original'.
+	 * @param string     $theme_uri  Parent theme URI.
+	 * @return string Comma-separated candidates, or '' when there are none.
+	 */
+	private static function srcset( array $image_data, string $image_size, string $theme_uri ): string {
+		$max_width = null;
+
+		if ( 'original' !== $image_size && isset( $image_data['variations'][ $image_size ] ) ) {
+			$max_width = self::pixel_width( $image_data['variations'][ $image_size ]['width'] );
+
+			if ( 0 === $max_width ) {
+				return '';
+			}
+		}
+
+		$candidates = array_merge( array( $image_data ), array_values( $image_data['variations'] ) );
+		$parts      = array();
+		$seen       = array();
+
+		foreach ( $candidates as $candidate ) {
+			$width = self::pixel_width( $candidate['width'] );
+			$url   = self::file_url( $theme_uri, $candidate['path'] );
+
+			if ( 0 === $width || ( null !== $max_width && $width > $max_width ) ) {
+				continue;
+			}
+
+			// Browsers keep the first of two equal descriptors and flag the second as an error.
+			if ( isset( $seen[ $url ] ) || isset( $seen[ $width ] ) ) {
+				continue;
+			}
+
+			$seen[ $url ]   = true;
+			$seen[ $width ] = true;
+			$parts[]        = sprintf( '%s %dw', $url, $width );
+		}
+
+		return implode( ', ', $parts );
+	}
+
+	/**
+	 * Returns a registered width as a pixel count, or 0 when it is not a positive integer.
+	 *
+	 * @param string $width Registered width.
+	 */
+	private static function pixel_width( string $width ): int {
+		$width = trim( $width );
+
+		return ctype_digit( $width ) ? (int) $width : 0;
+	}
+
+	/**
+	 * Builds the URL of a theme file, encoding each path segment.
+	 *
+	 * @param string $theme_uri Parent theme URI.
+	 * @param string $path      Path relative to the theme directory.
+	 */
+	private static function file_url( string $theme_uri, string $path ): string {
+		return $theme_uri . '/' . implode( '/', array_map( 'rawurlencode', explode( '/', $path ) ) );
 	}
 }
