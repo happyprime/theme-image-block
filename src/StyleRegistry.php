@@ -37,12 +37,11 @@ class StyleRegistry {
 	 * @return bool True if registered successfully, false otherwise.
 	 */
 	public static function register( string $slug, array $args ): bool {
-		if ( empty( $slug ) || empty( $args['name'] ) ) {
+		$slug = sanitize_key( $slug );
+
+		if ( '' === $slug || empty( $args['name'] ) ) {
 			return false;
 		}
-
-		// Sanitize the slug.
-		$slug = sanitize_key( $slug );
 
 		// This style is already registered.
 		if ( self::has( $slug ) ) {

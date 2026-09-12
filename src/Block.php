@@ -134,9 +134,8 @@ class Block {
 		$image_path = realpath( get_template_directory() . '/' . $display_path );
 		$theme_dir  = realpath( get_template_directory() );
 
-		// Protect against path traversal, even though these images are all
-		// registered via PHP anyway.
-		if ( ! $image_path || ! $theme_dir || strpos( $image_path, $theme_dir ) !== 0 ) {
+		// Registration validated the path; the theme may have changed on disk since.
+		if ( ! $image_path || ! $theme_dir || 0 !== strpos( $image_path, $theme_dir . DIRECTORY_SEPARATOR ) ) {
 			return '';
 		}
 

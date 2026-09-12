@@ -53,26 +53,17 @@ class Registry {
 	 * @return bool True if registered successfully, false otherwise.
 	 */
 	public static function register( string $slug, array $args ): bool {
-		if ( empty( $slug ) || empty( $args['title'] ) || empty( $args['path'] ) ) {
-			return false;
-		}
-
-		$full_path = realpath( get_template_directory() . '/' . $args['path'] );
-		$theme_dir = realpath( get_template_directory() );
-
-		// Protect against path traversal, even though these images are all
-		// registered via PHP anyway.
-		if ( ! $full_path || ! $theme_dir || strpos( $full_path, $theme_dir ) !== 0 ) {
-			return false;
-		}
-
-		// Only allow images that exist to be registered.
-		if ( ! file_exists( $full_path ) ) {
-			return false;
-		}
-
-		// Sanitize the slug.
 		$slug = sanitize_key( $slug );
+
+		if ( '' === $slug || empty( $args['title'] ) || empty( $args['path'] ) ) {
+			return false;
+		}
+
+		$path = self::resolve_path( $args['path'] );
+
+		if ( null === $path ) {
+			return false;
+		}
 
 		// This image is already registered.
 		if ( self::has( $slug ) ) {
@@ -102,7 +93,7 @@ class Registry {
 			'description' => sanitize_text_field( $args['description'] ),
 			'alt'         => sanitize_text_field( $args['alt'] ),
 			'caption'     => sanitize_text_field( $args['caption'] ),
-			'path'        => sanitize_text_field( $args['path'] ),
+			'path'        => $path,
 			'width'       => sanitize_text_field( $args['width'] ),
 			'height'      => sanitize_text_field( $args['height'] ),
 			'max_width'   => sanitize_text_field( $args['max_width'] ),
@@ -247,6 +238,38 @@ class Registry {
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * Resolves a theme-relative path to an existing file inside the parent theme directory.
+	 *
+	 * The returned path is rebuilt from realpath(), so symlinks and `..`
+	 * segments are gone and the file name is stored as it is on disk.
+	 *
+	 * @param mixed $path Path relative to the theme directory.
+	 * @return string|null The normalized relative path, or null when it does not resolve to a theme file.
+	 */
+	private static function resolve_path( $path ): ?string {
+		// realpath() throws on a null byte in PHP 8.
+		if ( ! is_string( $path ) || '' === $path || false !== strpos( $path, "\0" ) ) {
+			return null;
+		}
+
+		$theme_dir = realpath( get_template_directory() );
+		$full_path = realpath( get_template_directory() . '/' . $path );
+
+		if ( false === $theme_dir || false === $full_path || ! is_file( $full_path ) ) {
+			return null;
+		}
+
+		// The separator keeps a sibling directory sharing the theme's name as a prefix out.
+		$prefix = $theme_dir . DIRECTORY_SEPARATOR;
+
+		if ( 0 !== strpos( $full_path, $prefix ) ) {
+			return null;
+		}
+
+		return str_replace( DIRECTORY_SEPARATOR, '/', substr( $full_path, strlen( $prefix ) ) );
 	}
 
 	/**
