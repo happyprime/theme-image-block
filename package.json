@@ -48,6 +48,7 @@
     "fix": "eslint ./blocks/src --fix",
     "lint:package": "node ./node_modules/npm-package-json-lint/dist/cli.js ./package.json",
     "test:php": "wp-env run cli --config .wp-env.tests.json --env-cwd=wp-content/plugins/theme-image-block vendor/bin/phpunit",
+    "test:php:fuzz": "wp-env run cli --config .wp-env.tests.json --env-cwd=wp-content/plugins/theme-image-block sh -c \"TIB_FUZZ_SEED=$TIB_FUZZ_SEED TIB_FUZZ_RUNS=$TIB_FUZZ_RUNS vendor/bin/phpunit --filter Fuzz\"",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "env:start": "wp-env start",
