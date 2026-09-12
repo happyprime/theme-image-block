@@ -55,18 +55,28 @@ class Registry {
 	public static function register( string $slug, array $args ): bool {
 		$slug = sanitize_key( $slug );
 
-		if ( '' === $slug || empty( $args['title'] ) || empty( $args['path'] ) ) {
+		if ( '' === $slug ) {
+			self::warn( __( 'The image slug sanitizes to an empty string.', 'theme-image-block' ) );
+			return false;
+		}
+
+		if ( empty( $args['title'] ) || empty( $args['path'] ) ) {
+			/* translators: %s: image slug */
+			self::warn( sprintf( __( 'Image "%s" needs a title and a path.', 'theme-image-block' ), $slug ) );
 			return false;
 		}
 
 		$path = self::resolve_path( $args['path'] );
 
 		if ( null === $path ) {
+			/* translators: 1: image slug, 2: registered path */
+			self::warn( sprintf( __( 'Image "%1$s": the path "%2$s" is not a file inside the theme directory.', 'theme-image-block' ), $slug, is_string( $args['path'] ) ? $args['path'] : gettype( $args['path'] ) ) );
 			return false;
 		}
 
-		// This image is already registered.
 		if ( self::has( $slug ) ) {
+			/* translators: %s: image slug */
+			self::warn( sprintf( __( 'Image "%s" is already registered.', 'theme-image-block' ), $slug ) );
 			return false;
 		}
 
@@ -234,6 +244,8 @@ class Registry {
 			$path = self::resolve_path( $data['path'] ?? null );
 
 			if ( null === $path ) {
+				/* translators: %s: variation key */
+				self::warn( sprintf( __( 'Variation "%s" was dropped: its path is not a file inside the theme directory.', 'theme-image-block' ), $size ) );
 				continue;
 			}
 
@@ -278,6 +290,15 @@ class Registry {
 		}
 
 		return str_replace( DIRECTORY_SEPARATOR, '/', substr( $full_path, strlen( $prefix ) ) );
+	}
+
+	/**
+	 * Reports a rejected registration under WP_DEBUG.
+	 *
+	 * @param string $message Why the registration was rejected.
+	 */
+	private static function warn( string $message ): void {
+		_doing_it_wrong( __CLASS__ . '::register', esc_html( $message ), '1.2.0' );
 	}
 
 	/**

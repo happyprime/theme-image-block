@@ -76,6 +76,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image without title returns false.
 	 */
 	public function test_register_without_title_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -90,6 +92,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image without path returns false.
 	 */
 	public function test_register_without_path_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -104,6 +108,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image with empty slug returns false.
 	 */
 	public function test_register_with_empty_slug_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'',
 			array(
@@ -119,6 +125,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering non-existent file returns false.
 	 */
 	public function test_register_nonexistent_file_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -134,6 +142,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image with path traversal returns false.
 	 */
 	public function test_register_with_path_traversal_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -149,6 +159,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering duplicate slug returns false.
 	 */
 	public function test_register_duplicate_slug_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		Registry::register(
 			'test-image',
 			array(
@@ -360,6 +372,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test a variation whose file is missing is dropped.
 	 */
 	public function test_register_drops_variation_with_missing_file(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		Registry::register(
 			'test-image',
 			array(
