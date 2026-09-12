@@ -156,7 +156,7 @@ test.describe( 'Link, caption and alt text', () => {
 		);
 	} );
 
-	test( 'target _blank without a rel is rendered as given', async ( {
+	test( 'target _blank without a rel gains noopener', async ( {
 		page,
 		requestUtils,
 	} ) => {
@@ -168,8 +168,41 @@ test.describe( 'Link, caption and alt text', () => {
 
 				const link = page.locator( `${ FIGURE } > a` );
 				await expect( link ).toHaveAttribute( 'target', '_blank' );
-				// The block does not force noopener; hand-edited markup can omit it.
-				await expect( link ).not.toHaveAttribute( 'rel' );
+				await expect( link ).toHaveAttribute( 'rel', 'noopener' );
+			}
+		);
+	} );
+
+	test( 'a target that is not a browsing context keyword is dropped', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await withThemeImagePost(
+			requestUtils,
+			{ themeImage: 'alpha', linkUrl: 'https://example.com/', linkTarget: 'popup' },
+			async ( post ) => {
+				await page.goto( post.link );
+
+				const link = page.locator( `${ FIGURE } > a` );
+				await expect( link ).toHaveAttribute( 'href', 'https://example.com/' );
+				await expect( link ).not.toHaveAttribute( 'target' );
+			}
+		);
+	} );
+
+	test( 'the displayed file\'s pixel dimensions become width and height', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await withThemeImagePost(
+			requestUtils,
+			{ themeImage: 'tetons', imageSize: 'medium' },
+			async ( post ) => {
+				await page.goto( post.link );
+
+				const img = page.locator( `${ FIGURE } img` );
+				await expect( img ).toHaveAttribute( 'width', '800' );
+				await expect( img ).toHaveAttribute( 'height', '641' );
 			}
 		);
 	} );

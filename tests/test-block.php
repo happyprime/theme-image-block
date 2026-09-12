@@ -229,6 +229,57 @@ class Test_Block extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test width and height attributes come from the displayed file's pixel dimensions.
+	 */
+	public function test_img_dimensions_from_the_displayed_file(): void {
+		$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo' ) ), 'img' );
+		$this->assertSame( '1600', $img['width'] );
+		$this->assertSame( '1066', $img['height'] );
+
+		$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo', 'imageSize' => 'medium' ) ), 'img' );
+		$this->assertSame( '800', $img['width'] );
+		$this->assertSame( '533', $img['height'] );
+
+		// One dimension alone, or a non-pixel value, emits neither.
+		foreach ( array( array( 'themeImage' => 'photo', 'imageSize' => 'again' ), array( 'themeImage' => 'photo', 'imageSize' => 'rem' ), array( 'themeImage' => 'logo' ) ) as $attrs ) {
+			$img = $this->tag_attributes( $this->render( $attrs ), 'img' );
+			$this->assertArrayNotHasKey( 'width', $img, wp_json_encode( $attrs ) );
+			$this->assertArrayNotHasKey( 'height', $img, wp_json_encode( $attrs ) );
+		}
+	}
+
+	/**
+	 * Test only browsing context keywords are accepted as the link target.
+	 */
+	public function test_link_target_is_constrained(): void {
+		$base = array( 'themeImage' => 'photo', 'linkUrl' => 'https://example.com/' );
+
+		$a = $this->tag_attributes( $this->render( $base + array( 'linkTarget' => '_top' ) ), 'a' );
+		$this->assertSame( '_top', $a['target'] );
+		$this->assertArrayNotHasKey( 'rel', $a );
+
+		$a = $this->tag_attributes( $this->render( $base + array( 'linkTarget' => 'popup', 'linkRel' => 'nofollow' ) ), 'a' );
+		$this->assertArrayNotHasKey( 'target', $a );
+		$this->assertSame( 'nofollow', $a['rel'] );
+	}
+
+	/**
+	 * Test a _blank target always carries noopener.
+	 */
+	public function test_blank_target_forces_noopener(): void {
+		$base = array( 'themeImage' => 'photo', 'linkUrl' => 'https://example.com/', 'linkTarget' => '_blank' );
+
+		$a = $this->tag_attributes( $this->render( $base ), 'a' );
+		$this->assertSame( 'noopener', $a['rel'] );
+
+		$a = $this->tag_attributes( $this->render( $base + array( 'linkRel' => 'nofollow' ) ), 'a' );
+		$this->assertSame( 'nofollow noopener', $a['rel'] );
+
+		$a = $this->tag_attributes( $this->render( $base + array( 'linkRel' => 'noopener noreferrer' ) ), 'a' );
+		$this->assertSame( 'noopener noreferrer', $a['rel'] );
+	}
+
+	/**
 	 * Test each path segment is URL encoded.
 	 */
 	public function test_file_url_encodes_path_segments(): void {

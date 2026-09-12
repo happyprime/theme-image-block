@@ -60,8 +60,8 @@ class Block {
 		$image_size  = '' === $image_size ? 'original' : $image_size;
 		$inline_svg  = $attributes['inlineSVG'];
 		$link_url    = esc_url( $attributes['linkUrl'] );
-		$link_target = $attributes['linkTarget'];
-		$link_rel    = $attributes['linkRel'];
+		$link_target = in_array( $attributes['linkTarget'], array( '_blank', '_self', '_parent', '_top' ), true ) ? $attributes['linkTarget'] : '';
+		$link_rel    = self::link_rel( $attributes['linkRel'], $link_target );
 
 		// Get width/height from registered style if imageStyle is set.
 		$width  = '';
@@ -79,14 +79,14 @@ class Block {
 			}
 		}
 
-		// Determine the image path based on selected size.
-		$display_path = $image_data['path'];
-		if (
-			'original' !== $image_size &&
-			! empty( $image_data['variations'][ $image_size ]['path'] )
-		) {
-			$display_path = $image_data['variations'][ $image_size ]['path'];
+		$display = $image_data;
+		if ( 'original' !== $image_size && isset( $image_data['variations'][ $image_size ] ) ) {
+			$display = $image_data['variations'][ $image_size ];
 		}
+
+		$display_path   = $display['path'];
+		$display_width  = self::pixel_width( $display['width'] );
+		$display_height = self::pixel_width( $display['height'] );
 
 		// By extension: fileinfo is optional in PHP and libmagic misreads
 		// exports that open with a comment.
@@ -168,6 +168,11 @@ class Block {
 		$html = new \WP_HTML_Tag_Processor( $content );
 
 		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) ) {
+			// Both dimensions let the browser reserve space and core add lazy loading.
+			if ( $display_width > 0 && $display_height > 0 ) {
+				$html->set_attribute( 'width', (string) $display_width );
+				$html->set_attribute( 'height', (string) $display_height );
+			}
 			if ( ! empty( $inline_styles ) ) {
 				$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
 			}
@@ -290,9 +295,30 @@ class Block {
 	}
 
 	/**
-	 * Returns a registered width as a pixel count, or 0 when it is not a positive integer.
+	 * Returns the link rel, with noopener added when the link opens a new tab.
 	 *
-	 * @param string $width Registered width.
+	 * @param string $rel    Block rel attribute.
+	 * @param string $target Validated target attribute.
+	 */
+	private static function link_rel( string $rel, string $target ): string {
+		if ( '_blank' !== $target ) {
+			return $rel;
+		}
+
+		$tokens = preg_split( '/\s+/', trim( $rel ), -1, PREG_SPLIT_NO_EMPTY );
+		$tokens = is_array( $tokens ) ? $tokens : array();
+
+		if ( ! in_array( 'noopener', array_map( 'strtolower', $tokens ), true ) ) {
+			$tokens[] = 'noopener';
+		}
+
+		return implode( ' ', $tokens );
+	}
+
+	/**
+	 * Returns a registered dimension as a pixel count, or 0 when it is not a positive integer.
+	 *
+	 * @param string $width Registered width or height.
 	 */
 	private static function pixel_width( string $width ): int {
 		$width = trim( $width );
