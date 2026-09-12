@@ -1,0 +1,29 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/wp-admin/post-new.php",
+	"preferredVersions": {
+		"php": "8.2",
+		"wp": "latest"
+	},
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "theme-image-block"
+			}
+		},
+		{
+			"step": "mkdir",
+			"path": "/wordpress/wp-content/mu-plugins"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/theme-image-block-demo.php",
+			"data": "<?php\n// Registers the active theme's bundled images so the block has something to show.\nadd_action( 'init', function () {\n\tif ( ! function_exists( 'HappyPrime\\ThemeImageBlock\\register_theme_image' ) ) {\n\t\treturn;\n\t}\n\tforeach ( (array) glob( get_template_directory() . '/assets/images/*.{webp,jpg,png}', GLOB_BRACE ) as $file ) {\n\t\t$name = pathinfo( $file, PATHINFO_FILENAME );\n\t\t\\HappyPrime\\ThemeImageBlock\\register_theme_image(\n\t\t\t$name,\n\t\t\tarray(\n\t\t\t\t'title' => ucwords( str_replace( '-', ' ', $name ) ),\n\t\t\t\t'alt'   => ucfirst( str_replace( '-', ' ', $name ) ),\n\t\t\t\t'path'  => 'assets/images/' . basename( $file ),\n\t\t\t)\n\t\t);\n\t}\n} );\n"
+		},
+		{
+			"step": "login"
+		}
+	]
+}
