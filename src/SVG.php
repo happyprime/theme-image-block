@@ -40,7 +40,7 @@ class SVG {
 			return '';
 		}
 
-		if ( $args['alt'] ) {
+		if ( '' !== $args['alt'] ) {
 			$processor->set_attribute( 'aria-label', $args['alt'] );
 			$processor->set_attribute( 'role', 'img' );
 			$processor->remove_attribute( 'aria-hidden' );
@@ -51,20 +51,15 @@ class SVG {
 
 		$processor->set_attribute( 'focusable', 'false' );
 
-		$inline_styles = array();
-		if ( $args['width'] ) {
-			$inline_styles[] = 'width: ' . $args['width'];
-		}
-		if ( $args['height'] ) {
-			$inline_styles[] = 'height: ' . $args['height'];
-		}
-		if ( $args['max_width'] ) {
-			$inline_styles[] = 'max-width: ' . $args['max_width'];
-		}
-		if ( $args['max_height'] ) {
-			$inline_styles[] = 'max-height: ' . $args['max_height'];
-		}
-		if ( ! empty( $inline_styles ) ) {
+		$inline_styles = Block::inline_styles(
+			array(
+				'width'      => $args['width'],
+				'height'     => $args['height'],
+				'max-width'  => $args['max_width'],
+				'max-height' => $args['max_height'],
+			)
+		);
+		if ( array() !== $inline_styles ) {
 			$existing = $processor->get_attribute( 'style' );
 			if ( is_string( $existing ) && '' !== trim( $existing, "; \t\n\r" ) ) {
 				array_unshift( $inline_styles, trim( $existing, "; \t\n\r" ) );
@@ -86,8 +81,17 @@ class SVG {
 	 * @return string SVG markup starting at the root element, or ''.
 	 */
 	private static function read( string $path ): string {
+		// A logo in a template part renders on every page; read it once per request.
+		static $cache = array();
+
 		if ( ! is_file( $path ) || ! is_readable( $path ) ) {
 			return '';
+		}
+
+		$key = $path . '|' . filemtime( $path ) . '|' . filesize( $path );
+
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
 		}
 
 		$svg = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
@@ -101,6 +105,8 @@ class SVG {
 		if ( ! is_string( $svg ) || 1 !== preg_match( '/^<svg[\s\/>]/i', $svg ) ) {
 			return '';
 		}
+
+		$cache[ $key ] = $svg;
 
 		return $svg;
 	}

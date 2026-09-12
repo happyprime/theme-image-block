@@ -280,6 +280,32 @@ class Test_Block extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test a style value of 0 is emitted.
+	 */
+	public function test_zero_style_value_is_emitted(): void {
+		StyleRegistry::register( 'flat', array( 'name' => 'Flat', 'height' => '0' ) );
+
+		$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo', 'imageStyle' => 'flat' ) ), 'img' );
+
+		$this->assertSame( 'height: 0', $img['style'] );
+	}
+
+	/**
+	 * Test the img pass leaves an img inside an inlined SVG alone.
+	 */
+	public function test_inline_svg_foreign_object_img_is_untouched(): void {
+		copy( __DIR__ . '/fixtures/svg/svg-nested.svg', $this->theme . '/images/nested.svg' );
+		file_put_contents( $this->theme . '/images/nested.svg', str_replace( '<div xmlns="http://www.w3.org/1999/xhtml">hi</div>', '<img src="x.png" alt="">', file_get_contents( $this->theme . '/images/nested.svg' ) ) );
+		Registry::register( 'nested', array( 'title' => 'Nested', 'path' => 'images/nested.svg', 'width' => '200', 'sizes' => '100vw' ) );
+		StyleRegistry::register( 'thumb', array( 'name' => 'Thumb', 'width' => '150px' ) );
+
+		$html = $this->render( array( 'themeImage' => 'nested', 'inlineSVG' => true, 'imageStyle' => 'thumb' ) );
+
+		$this->assertStringContainsString( '<img src="x.png" alt="">', $html );
+		$this->assertStringContainsString( 'style="width: 150px"', $html );
+	}
+
+	/**
 	 * Test each path segment is URL encoded.
 	 */
 	public function test_file_url_encodes_path_segments(): void {

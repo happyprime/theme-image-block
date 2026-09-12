@@ -30,12 +30,12 @@ class Block {
 	 *     @type string $altText     Custom alt text to override the registered default. Default empty string.
 	 *     @type bool   $omitAltText Whether to omit alt text entirely. Default false.
 	 * }
-	 * @param string               $content    Block content.
+	 * @param string               $content    Inner block content, unused.
 	 *
 	 * @return string Rendered block HTML.
 	 */
-	public static function render( $attributes, $content ): string {
-		$attributes = self::normalize_attributes( (array) $attributes );
+	public static function render( array $attributes, string $content = '' ): string {
+		$attributes = self::normalize_attributes( $attributes );
 
 		if ( '' === $attributes['themeImage'] ) {
 			return '';
@@ -70,12 +70,8 @@ class Block {
 			$style_data = StyleRegistry::get( $attributes['imageStyle'] );
 
 			if ( $style_data ) {
-				if ( ! empty( $style_data['width'] ) ) {
-					$width = $style_data['width'];
-				}
-				if ( ! empty( $style_data['height'] ) ) {
-					$height = $style_data['height'];
-				}
+				$width  = $style_data['width'];
+				$height = $style_data['height'];
 			}
 		}
 
@@ -106,19 +102,14 @@ class Block {
 			return '';
 		}
 
-		$inline_styles = array();
-		if ( $width ) {
-			$inline_styles[] = 'width: ' . $width;
-		}
-		if ( $height ) {
-			$inline_styles[] = 'height: ' . $height;
-		}
-		if ( ! empty( $image_data['max_width'] ) ) {
-			$inline_styles[] = 'max-width: ' . $image_data['max_width'];
-		}
-		if ( ! empty( $image_data['max_height'] ) ) {
-			$inline_styles[] = 'max-height: ' . $image_data['max_height'];
-		}
+		$inline_styles = self::inline_styles(
+			array(
+				'width'      => $width,
+				'height'     => $height,
+				'max-width'  => $image_data['max_width'],
+				'max-height' => $image_data['max_height'],
+			)
+		);
 
 		$wrapper_classes = array();
 		$content         = '';
@@ -165,26 +156,29 @@ class Block {
 			$content = $html->get_updated_html();
 		}
 
-		$html = new \WP_HTML_Tag_Processor( $content );
+		// An inlined SVG may hold an img of its own inside a foreignObject.
+		if ( ! $inline_svg ) {
+			$html = new \WP_HTML_Tag_Processor( $content );
 
-		if ( $html->next_tag( array( 'tag_name' => 'img' ) ) ) {
-			// Both dimensions let the browser reserve space and core add lazy loading.
-			if ( $display_width > 0 && $display_height > 0 ) {
-				$html->set_attribute( 'width', (string) $display_width );
-				$html->set_attribute( 'height', (string) $display_height );
+			if ( $html->next_tag( array( 'tag_name' => 'img' ) ) ) {
+				// Both dimensions let the browser reserve space and core add lazy loading.
+				if ( $display_width > 0 && $display_height > 0 ) {
+					$html->set_attribute( 'width', (string) $display_width );
+					$html->set_attribute( 'height', (string) $display_height );
+				}
+				if ( array() !== $inline_styles ) {
+					$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
+				}
+				if ( '' !== $srcset ) {
+					$html->set_attribute( 'srcset', $srcset );
+				}
+				if ( '' !== $sizes ) {
+					$html->set_attribute( 'sizes', $sizes );
+				}
 			}
-			if ( ! empty( $inline_styles ) ) {
-				$html->set_attribute( 'style', implode( '; ', $inline_styles ) );
-			}
-			if ( ! empty( $srcset ) ) {
-				$html->set_attribute( 'srcset', $srcset );
-			}
-			if ( ! empty( $sizes ) ) {
-				$html->set_attribute( 'sizes', $sizes );
-			}
+
+			$content = $html->get_updated_html();
 		}
-
-		$content = $html->get_updated_html();
 
 		$caption = wp_kses_post( '' !== $attributes['caption'] ? $attributes['caption'] : $image_data['caption'] );
 		if ( $attributes['showCaption'] && '' !== $caption ) {
@@ -292,6 +286,26 @@ class Block {
 		}
 
 		return implode( ', ', $parts );
+	}
+
+	/**
+	 * Builds `property: value` declarations from the values that are set.
+	 *
+	 * A value of '0' is set; only '' is skipped.
+	 *
+	 * @param array<string, string> $values CSS values keyed by property.
+	 * @return string[]
+	 */
+	public static function inline_styles( array $values ): array {
+		$styles = array();
+
+		foreach ( $values as $property => $value ) {
+			if ( '' !== $value ) {
+				$styles[] = $property . ': ' . $value;
+			}
+		}
+
+		return $styles;
 	}
 
 	/**

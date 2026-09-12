@@ -258,6 +258,15 @@ class Test_SVG extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test a width of 0 is emitted.
+	 */
+	public function test_get_with_zero_width_adds_width_style(): void {
+		$result = SVG::get( $this->test_svg_path, array( 'width' => '0' ) );
+
+		$this->assertStringContainsString( 'style="width: 0"', $result );
+	}
+
+	/**
 	 * Test get preserves original SVG content.
 	 */
 	public function test_get_preserves_original_content(): void {
