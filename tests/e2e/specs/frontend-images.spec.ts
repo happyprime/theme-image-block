@@ -64,10 +64,6 @@ test.describe( 'Front end image URLs', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'K5/S3: Registry::sanitize_variations() never checks that a variation file exists, so images/tetons-ghost.jpg is emitted as a 1200w candidate and returns 404.'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'brokenvars' },

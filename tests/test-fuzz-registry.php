@@ -330,11 +330,16 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 				$this->assertSame( sanitize_text_field( $stored[ $field ] ), $stored[ $field ], $this->replay( $i, $input, "stored $field is not sanitize_text_field() stable" ) );
 			}
 			$this->assertIsArray( $stored['variations'] );
+			$this->assertArrayNotHasKey( '', $stored['variations'], $this->replay( $i, $input, 'a variation is stored under the empty key' ) );
 			foreach ( $stored['variations'] as $size => $variation ) {
 				$this->assertSame( array( 'name', 'path', 'width', 'height' ), array_keys( $variation ), $this->replay( $i, $input, 'variation keys drifted' ) );
-				foreach ( $variation as $field => $value ) {
-					$this->assertSame( sanitize_text_field( $value ), $value, $this->replay( $i, $input, "variation $size.$field is not sanitize_text_field() stable" ) );
+				foreach ( array( 'name', 'width', 'height' ) as $field ) {
+					$this->assertSame( sanitize_text_field( $variation[ $field ] ), $variation[ $field ], $this->replay( $i, $input, "variation $size.$field is not sanitize_text_field() stable" ) );
 				}
+				$real = realpath( $this->theme . '/' . $variation['path'] );
+				$this->assertNotFalse( $real, $this->replay( $i, $input, "variation $size path does not resolve: {$variation['path']}" ) );
+				$this->assertStringStartsWith( $this->theme . '/', $real, $this->replay( $i, $input, "variation $size resolves outside the theme: $real" ) );
+				$this->assertTrue( is_file( $real ), $this->replay( $i, $input, "variation $size is not a file: $real" ) );
 			}
 
 			$json = wp_json_encode( Registry::get_for_editor() );
@@ -458,8 +463,6 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 
 	/**
 	 * Variation paths get the same containment check as the main path.
-	 *
-	 * S3/K5: sanitize_variations() only runs sanitize_text_field() on the path.
 	 */
 	public function test_variation_path_outside_theme_is_dropped(): void {
 		$this->assertTrue(
@@ -477,18 +480,6 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 				)
 			)
 		);
-
-		$bad = array();
-		foreach ( Registry::get( 'vars' )['variations'] as $size => $variation ) {
-			$real = realpath( $this->theme . '/' . $variation['path'] );
-			if ( ! $real || 0 !== strpos( $real, $this->theme . '/' ) ) {
-				$bad[] = "$size => {$variation['path']}";
-			}
-		}
-
-		if ( $bad ) {
-			$this->markTestIncomplete( 'S3/K5: variations stored without a containment or existence check: ' . implode( ', ', $bad ) );
-		}
 
 		$this->assertSame( array( 'ok' ), array_keys( Registry::get( 'vars' )['variations'] ) );
 	}

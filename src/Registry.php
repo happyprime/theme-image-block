@@ -211,7 +211,7 @@ class Registry {
 	}
 
 	/**
-	 * Sanitize image variations.
+	 * Sanitizes image variations, dropping any whose path is not a theme file.
 	 *
 	 * @param mixed $variations Image variations.
 	 *
@@ -225,13 +225,21 @@ class Registry {
 		$sanitized = array();
 
 		foreach ( $variations as $size => $data ) {
-			if ( ! is_array( $data ) ) {
+			$size = sanitize_key( (string) $size );
+
+			if ( '' === $size || ! is_array( $data ) ) {
 				continue;
 			}
 
-			$sanitized[ sanitize_key( $size ) ] = array(
+			$path = self::resolve_path( $data['path'] ?? null );
+
+			if ( null === $path ) {
+				continue;
+			}
+
+			$sanitized[ $size ] = array(
 				'name'   => isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '',
-				'path'   => isset( $data['path'] ) ? sanitize_text_field( $data['path'] ) : '',
+				'path'   => $path,
 				'width'  => isset( $data['width'] ) ? sanitize_text_field( $data['width'] ) : '',
 				'height' => isset( $data['height'] ) ? sanitize_text_field( $data['height'] ) : '',
 			);
