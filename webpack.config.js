@@ -31,7 +31,12 @@ module.exports = {
 				use: {
 					loader: 'babel-loader',
 					options: {
-						presets: ['@babel/preset-env', '@babel/preset-react'],
+						presets: [
+							'@babel/preset-env',
+							// WordPress registers react-jsx-runtime only, so
+							// the dev runtime must never be emitted.
+							['@babel/preset-react', { development: false }],
+						],
 						plugins: ['@babel/plugin-transform-runtime'],
 					},
 				},
