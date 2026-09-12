@@ -43,8 +43,10 @@ class SVG {
 		if ( $args['alt'] ) {
 			$processor->set_attribute( 'aria-label', $args['alt'] );
 			$processor->set_attribute( 'role', 'img' );
+			$processor->remove_attribute( 'aria-hidden' );
 		} else {
 			$processor->set_attribute( 'aria-hidden', 'true' );
+			$processor->remove_attribute( 'aria-label' );
 		}
 
 		$processor->set_attribute( 'focusable', 'false' );
@@ -63,6 +65,10 @@ class SVG {
 			$inline_styles[] = 'max-height: ' . $args['max_height'];
 		}
 		if ( ! empty( $inline_styles ) ) {
+			$existing = $processor->get_attribute( 'style' );
+			if ( is_string( $existing ) && '' !== trim( $existing, "; \t\n\r" ) ) {
+				array_unshift( $inline_styles, trim( $existing, "; \t\n\r" ) );
+			}
 			$processor->set_attribute( 'style', implode( '; ', $inline_styles ) );
 		}
 

@@ -169,10 +169,6 @@ test.describe( 'SVG', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'K2: SVG::get() replaces an existing root style attribute instead of merging; the editor preview merges, so the two drift.'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'prolog', inlineSVG: true, imageStyle: 'thumb' },

@@ -134,11 +134,9 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 	}
 
 	/**
-	 * A width replaces an existing root style attribute; without one it is kept.
-	 *
-	 * K2: the editor preview merges the two, so the front end drifts from it.
+	 * Dimensions are appended to an existing root style attribute.
 	 */
-	public function test_existing_root_style_is_replaced_by_dimensions(): void {
+	public function test_existing_root_style_is_merged_with_dimensions(): void {
 		$file = __DIR__ . '/fixtures/svg/svg-with-prolog-and-doctype.svg';
 
 		$processor = new WP_HTML_Tag_Processor( SVG::get( $file ) );
@@ -147,14 +145,11 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 
 		$processor = new WP_HTML_Tag_Processor( SVG::get( $file, array( 'width' => '10rem', 'max_height' => '5rem' ) ) );
 		$processor->next_tag( array( 'tag_name' => 'svg' ) );
-		$this->assertSame( 'width: 10rem; max-height: 5rem', $processor->get_attribute( 'style' ) );
+		$this->assertSame( 'border: 1px solid red; width: 10rem; max-height: 5rem', $processor->get_attribute( 'style' ) );
 	}
 
 	/**
 	 * A labelled SVG must not keep an aria-hidden="true" from the file.
-	 *
-	 * K15: set_attribute() overwrites role and aria-label but nothing removes
-	 * aria-hidden, so the SVG stays hidden from assistive tech despite the label.
 	 */
 	public function test_existing_aria_hidden_is_removed_when_labelled(): void {
 		$file = $this->scratch . '/hidden.svg';
@@ -166,11 +161,6 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 		$this->assertSame( 'img', $processor->get_attribute( 'role' ) );
 		$this->assertSame( 'Labelled', $processor->get_attribute( 'aria-label' ) );
 		$this->assertSame( 'false', $processor->get_attribute( 'focusable' ) );
-
-		if ( 'true' === $processor->get_attribute( 'aria-hidden' ) ) {
-			$this->markTestIncomplete( 'K15: SVG::get() sets role="img" and aria-label but leaves the file\'s aria-hidden="true" in place.' );
-		}
-
 		$this->assertNull( $processor->get_attribute( 'aria-hidden' ) );
 	}
 
@@ -263,10 +253,10 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 
 			$this->assertStringStartsWith( '<svg', $output, $this->replay( $i, $input, 'output does not start at the root element' ) );
 
-			// A root that already carries role/aria-hidden is K15's case below.
+			// Without alt an existing role is left as the file set it.
 			$root = new WP_HTML_Tag_Processor( $svg );
 			$root->next_tag( array( 'tag_name' => 'svg' ) );
-			if ( null !== $root->get_attribute( 'role' ) || null !== $root->get_attribute( 'aria-hidden' ) ) {
+			if ( '' === $alt && null !== $root->get_attribute( 'role' ) ) {
 				continue;
 			}
 
