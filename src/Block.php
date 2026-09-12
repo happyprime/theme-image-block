@@ -11,12 +11,13 @@ namespace HappyPrime\ThemeImageBlock;
  * Render the theme image block.
  *
  * @phpstan-type Image_Data array{path: string, width: string, variations: array<string, array{path: string, width: string}>}
+ * @phpstan-type Attributes array{themeImage: string, imageSize: string, imageStyle: string, inlineSVG: bool, linkUrl: string, linkTarget: string, linkRel: string, caption: string, showCaption: bool, altText: string, omitAltText: bool}
  */
 class Block {
 	/**
 	 * Render the theme image block.
 	 *
-	 * @param array<string, string> $attributes Block attributes. {
+	 * @param array<string, mixed> $attributes Block attributes. {
 	 *     @type string $themeImage  The slug of the theme image to display. Required.
 	 *     @type string $imageSize   The size variation to display. Default 'original'.
 	 *     @type string $imageStyle  The slug of the registered style to apply. Default empty string.
@@ -29,46 +30,44 @@ class Block {
 	 *     @type string $altText     Custom alt text to override the registered default. Default empty string.
 	 *     @type bool   $omitAltText Whether to omit alt text entirely. Default false.
 	 * }
-	 * @param string                $content    Block content.
+	 * @param string               $content    Block content.
 	 *
 	 * @return string Rendered block HTML.
 	 */
 	public static function render( $attributes, $content ): string {
-		if ( empty( $attributes['themeImage'] ) ) {
+		$attributes = self::normalize_attributes( (array) $attributes );
+
+		if ( '' === $attributes['themeImage'] ) {
 			return '';
 		}
 
-		// Get the image slug and look up the registered image data.
-		$image_slug = sanitize_key( $attributes['themeImage'] );
-		$image_data = Registry::get( $image_slug );
+		$image_data = Registry::get( $attributes['themeImage'] );
 
-		// If the image isn't registered, return an empty string.
 		if ( ! $image_data ) {
 			return '';
 		}
 
 		// Kept raw: the img sprintf and set_attribute() each escape once.
-		$omit_alt_text = isset( $attributes['omitAltText'] ) && $attributes['omitAltText'];
-		if ( $omit_alt_text ) {
+		if ( $attributes['omitAltText'] ) {
 			$alt = '';
-		} elseif ( isset( $attributes['altText'] ) && ! empty( $attributes['altText'] ) ) {
+		} elseif ( '' !== $attributes['altText'] ) {
 			$alt = $attributes['altText'];
 		} else {
 			$alt = $image_data['alt'];
 		}
 
-		$image_size  = isset( $attributes['imageSize'] ) ? sanitize_key( $attributes['imageSize'] ) : 'original';
-		$inline_svg  = isset( $attributes['inlineSVG'] ) && $attributes['inlineSVG'];
-		$link_url    = isset( $attributes['linkUrl'] ) ? esc_url( $attributes['linkUrl'] ) : '';
-		$link_target = isset( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '';
-		$link_rel    = isset( $attributes['linkRel'] ) ? $attributes['linkRel'] : '';
+		$image_size  = sanitize_key( $attributes['imageSize'] );
+		$image_size  = '' === $image_size ? 'original' : $image_size;
+		$inline_svg  = $attributes['inlineSVG'];
+		$link_url    = esc_url( $attributes['linkUrl'] );
+		$link_target = $attributes['linkTarget'];
+		$link_rel    = $attributes['linkRel'];
 
 		// Get width/height from registered style if imageStyle is set.
 		$width  = '';
 		$height = '';
-		if ( isset( $attributes['imageStyle'] ) && ! empty( $attributes['imageStyle'] ) ) {
-			$style_slug = sanitize_key( $attributes['imageStyle'] );
-			$style_data = StyleRegistry::get( $style_slug );
+		if ( '' !== $attributes['imageStyle'] ) {
+			$style_data = StyleRegistry::get( $attributes['imageStyle'] );
 
 			if ( $style_data ) {
 				if ( ! empty( $style_data['width'] ) ) {
@@ -182,10 +181,8 @@ class Block {
 
 		$content = $html->get_updated_html();
 
-		// Add caption if showCaption is enabled and caption is provided.
-		$show_caption = isset( $attributes['showCaption'] ) && $attributes['showCaption'];
-		$caption      = isset( $attributes['caption'] ) ? wp_kses_post( $attributes['caption'] ) : '';
-		if ( $show_caption && ! empty( $caption ) ) {
+		$caption = wp_kses_post( $attributes['caption'] );
+		if ( $attributes['showCaption'] && '' !== $caption ) {
 			$content .= sprintf( '<figcaption>%s</figcaption>', $caption );
 		}
 
@@ -198,6 +195,51 @@ class Block {
 			get_block_wrapper_attributes( $wrapper_attrs ),
 			$content
 		);
+	}
+
+	/**
+	 * Coerces attribute values to the types block.json declares.
+	 *
+	 * Core validates attributes before calling a render callback; a direct
+	 * caller may pass anything.
+	 *
+	 * @param array<string, mixed> $attributes Raw attributes.
+	 * @return Attributes
+	 */
+	private static function normalize_attributes( array $attributes ): array {
+		return array(
+			'themeImage'  => self::string_attribute( $attributes, 'themeImage' ),
+			'imageSize'   => self::string_attribute( $attributes, 'imageSize' ),
+			'imageStyle'  => self::string_attribute( $attributes, 'imageStyle' ),
+			'inlineSVG'   => self::bool_attribute( $attributes, 'inlineSVG' ),
+			'linkUrl'     => self::string_attribute( $attributes, 'linkUrl' ),
+			'linkTarget'  => self::string_attribute( $attributes, 'linkTarget' ),
+			'linkRel'     => self::string_attribute( $attributes, 'linkRel' ),
+			'caption'     => self::string_attribute( $attributes, 'caption' ),
+			'showCaption' => self::bool_attribute( $attributes, 'showCaption' ),
+			'altText'     => self::string_attribute( $attributes, 'altText' ),
+			'omitAltText' => self::bool_attribute( $attributes, 'omitAltText' ),
+		);
+	}
+
+	/**
+	 * Returns an attribute as a string, or '' when it is not one.
+	 *
+	 * @param array<string, mixed> $attributes Raw attributes.
+	 * @param string               $name       Attribute name.
+	 */
+	private static function string_attribute( array $attributes, string $name ): string {
+		return isset( $attributes[ $name ] ) && is_string( $attributes[ $name ] ) ? $attributes[ $name ] : '';
+	}
+
+	/**
+	 * Returns an attribute as a bool; anything but a truthy scalar is false.
+	 *
+	 * @param array<string, mixed> $attributes Raw attributes.
+	 * @param string               $name       Attribute name.
+	 */
+	private static function bool_attribute( array $attributes, string $name ): bool {
+		return isset( $attributes[ $name ] ) && is_scalar( $attributes[ $name ] ) && (bool) $attributes[ $name ];
 	}
 
 	/**

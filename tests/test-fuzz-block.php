@@ -296,8 +296,7 @@ class Test_Fuzz_Block extends Fuzz_Case {
 	 * fail block.json validation before the render callback runs.
 	 */
 	public function test_render_direct_with_wrong_types_does_not_throw(): void {
-		$wild   = array( null, array(), array( 'x' ), 0, 1, true, new \stdClass() );
-		$broken = array();
+		$wild = array( null, array(), array( 'x' ), 0, 1, true, new \stdClass() );
 
 		foreach ( array( 'themeImage', 'imageSize', 'imageStyle', 'inlineSVG', 'linkUrl', 'linkTarget', 'linkRel', 'caption', 'showCaption', 'altText', 'omitAltText' ) as $name ) {
 			foreach ( $wild as $value ) {
@@ -312,15 +311,34 @@ class Test_Fuzz_Block extends Fuzz_Case {
 				WP_Block_Supports::$block_to_render = array( 'blockName' => 'happyprime/theme-image', 'attrs' => $attrs );
 
 				try {
-					$this->assertIsString( Block::render( $attrs, '' ) );
+					$html = Block::render( $attrs, '' );
 				} catch ( \Throwable $e ) {
-					$broken[] = sprintf( '%s => %s: %s', $name, var_export( $value, true ), $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+					$this->fail( sprintf( '%s => %s: %s', $name, var_export( $value, true ), $e->getMessage() ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 				}
+
+				$this->assertIsString( $html );
+				$this->assert_safe_markup( $html, 0, $attrs );
 			}
 		}
+	}
 
-		if ( $broken ) {
-			$this->markTestIncomplete( "Block::render() does not guard attribute types (direct callers only):\n" . implode( "\n", $broken ) );
+	/**
+	 * Direct calls with random values of any type emit safe markup.
+	 */
+	public function test_render_direct_with_wild_types_emits_safe_markup(): void {
+		for ( $i = 0; $i < $this->runs; $i++ ) {
+			$attrs = $this->random_attributes( false );
+
+			WP_Block_Supports::$block_to_render = array( 'blockName' => 'happyprime/theme-image', 'attrs' => $attrs );
+
+			try {
+				$html = Block::render( $attrs, '' );
+			} catch ( \Throwable $e ) {
+				$this->fail( $this->replay( $i, $attrs, get_class( $e ) . ': ' . $e->getMessage() ) );
+			}
+
+			$this->assertIsString( $html );
+			$this->assert_safe_markup( $html, $i, $attrs );
 		}
 	}
 }
