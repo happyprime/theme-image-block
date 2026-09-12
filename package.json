@@ -44,11 +44,16 @@
     "lint": "eslint ./blocks/src",
     "fix": "eslint ./blocks/src --fix",
     "lint:package": "node ./node_modules/npm-package-json-lint/dist/cli.js ./",
+    "test:php": "wp-env run cli --config .wp-env.tests.json --env-cwd=wp-content/plugins/theme-image-block vendor/bin/phpunit",
     "env:start": "wp-env start",
+    "env:update": "wp-env start --update",
     "env:stop": "wp-env stop",
     "env:destroy": "wp-env destroy",
     "env:cli": "wp-env run cli",
-    "env:logs": "wp-env logs"
+    "env:logs": "wp-env logs",
+    "env:test:start": "wp-env start --config .wp-env.tests.json",
+    "env:test:stop": "wp-env stop --config .wp-env.tests.json",
+    "env:test:destroy": "wp-env destroy --config .wp-env.tests.json"
   },
   "npmpackagejsonlint": {
     "extends": "@wordpress/npm-package-json-lint-config"
