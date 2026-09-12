@@ -65,3 +65,39 @@ HappyPrime\ThemeImageBlock\register_theme_image_style(
 	]
 );
 ```
+
+## Development
+
+`npm run env:start` brings up WordPress 7.1 on http://localhost:8892 with the
+plugin active (wp-env, Docker). The dev site also mounts the e2e fixture theme
+from `tests/e2e/fixtures/theme/`; `npm run env:cli -- wp ...` runs wp-cli
+inside it.
+
+### End-to-end tests
+
+```
+npm run test:e2e        # headless; starts wp-env if it is down, stops it after
+npm run test:e2e:ui     # Playwright UI mode against a running env
+```
+
+Global setup activates the `theme-image-block-e2e` theme, which registers the
+images and styles the specs assert against. `test.fixme()` marks cases that
+fail on a known plugin bug; the reason names the finding.
+
+### PHPUnit
+
+```
+npm run test:php        # unit and fuzz tests in the tests env (port 8894)
+npm run test:php:fuzz   # fuzz tests only
+```
+
+The fuzz tests seed `mt_rand()` from `TIB_FUZZ_SEED` (default `12345`) and
+run `TIB_FUZZ_RUNS` iterations (default `300`). A failure prints both plus
+the generated input; replay it with
+
+```
+TIB_FUZZ_SEED=777 TIB_FUZZ_RUNS=1000 npm run test:php:fuzz
+```
+
+Tests that hit a known bug end in `markTestIncomplete()` with the finding, so
+the suite stays green until the fix flips them.
