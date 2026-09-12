@@ -6,6 +6,9 @@
 	"plugins": [
 		"."
 	],
+	"themes": [
+		"./tests/e2e/fixtures/theme/theme-image-block-e2e"
+	],
 	"config": {
 		"WP_DEBUG": true,
 		"WP_DEBUG_LOG": true,
