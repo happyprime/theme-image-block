@@ -1,3 +1,10 @@
 node_modules
 .claude
 .phpunit.result.cache
+
+# Playwright
+/tests/e2e/.auth/
+/tests/e2e/test-results/
+/tests/e2e/playwright-report/
+/tests/e2e/.env-started-by-tests
+/artifacts/
