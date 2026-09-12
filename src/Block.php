@@ -156,11 +156,13 @@ class Block {
 
 		$wrapper_classes = array();
 
-		$is_svg = 'image/svg+xml' === mime_content_type( $image_path );
+		// By extension: fileinfo is optional in PHP and libmagic misreads
+		// exports that open with a comment.
+		$filetype = wp_check_filetype( $image_path, array( 'svg' => 'image/svg+xml' ) );
+		$content  = '';
 
-		if ( $inline_svg && $is_svg ) {
-			$wrapper_classes[] = 'has-inline-svg';
-			$content           = SVG::get(
+		if ( $inline_svg && 'image/svg+xml' === $filetype['type'] ) {
+			$content = SVG::get(
 				$image_path,
 				[
 					'alt'        => $alt,
@@ -170,6 +172,12 @@ class Block {
 					'max_height' => $image_data['max_height'],
 				]
 			);
+		}
+
+		$inline_svg = '' !== $content;
+
+		if ( $inline_svg ) {
+			$wrapper_classes[] = 'has-inline-svg';
 		} else {
 			$content = sprintf(
 				'<img src="%s" alt="%s" />',

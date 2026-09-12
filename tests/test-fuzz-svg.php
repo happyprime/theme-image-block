@@ -107,8 +107,7 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 				}
 
 				if ( ! self::has_svg_tag( $input ) ) {
-					// No root tag to decorate, so the bytes pass through untouched.
-					$this->assertSame( $input, $output, "$name: passthrough without an svg tag" );
+					$this->assertSame( '', $output, "$name: nothing to inline without an svg tag" );
 					continue;
 				}
 

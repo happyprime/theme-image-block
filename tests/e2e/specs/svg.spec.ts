@@ -132,10 +132,6 @@ test.describe( 'SVG', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'K1: Block::render decides SVG-ness with mime_content_type(), which reports text/plain for a file that starts with a comment, so inlineSVG falls back to <img>.'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'exported', inlineSVG: true },
