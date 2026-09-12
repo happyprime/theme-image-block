@@ -106,11 +106,12 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 					continue;
 				}
 
-				if ( ! self::has_svg_tag( $input ) ) {
-					$this->assertSame( '', $output, "$name: nothing to inline without an svg tag" );
+				if ( ! self::has_svg_tag( $input ) || 'svg-entities.svg' === $name ) {
+					$this->assertSame( '', $output, "$name: nothing to inline" );
 					continue;
 				}
 
+				$this->assertStringStartsWith( '<svg', $output, "$name: output starts at the root element" );
 				$this->assert_a11y( $output, $alt, "$name (alt '$alt')" );
 			}
 		}
@@ -253,9 +254,14 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 			$this->assertIsString( $output );
 			$this->assertLessThanOrEqual( strlen( $svg ) + 1024 + 8 * strlen( $alt ), strlen( $output ), $this->replay( $i, $input, 'output grew more than the added attributes explain' ) );
 
-			if ( '' === $svg || ! self::has_svg_tag( $svg ) ) {
+			if ( '' === $output ) {
+				// A file that opens with its root element must always inline.
+				$opens_with_root = 1 === preg_match( '/^\s*<svg[\s\/>]/i', $svg ) && self::has_svg_tag( $svg );
+				$this->assertFalse( $opens_with_root, $this->replay( $i, $input, 'a file opening with <svg was not inlined' ) );
 				continue;
 			}
+
+			$this->assertStringStartsWith( '<svg', $output, $this->replay( $i, $input, 'output does not start at the root element' ) );
 
 			// A root that already carries role/aria-hidden is K15's case below.
 			$root = new WP_HTML_Tag_Processor( $svg );

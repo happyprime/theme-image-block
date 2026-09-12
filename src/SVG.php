@@ -16,12 +16,12 @@ class SVG {
 	 *
 	 * @param string                $path Absolute path to the SVG file.
 	 * @param array<string, string> $args Alt text and CSS dimensions to apply.
-	 * @return string The SVG markup, or '' when the file has no svg root element.
+	 * @return string The SVG markup, or '' when the file cannot be inlined.
 	 */
 	public static function get( string $path, array $args = array() ): string {
-		$svg = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$svg = self::read( $path );
 
-		if ( ! $svg ) {
+		if ( '' === $svg ) {
 			return '';
 		}
 
@@ -67,5 +67,35 @@ class SVG {
 		}
 
 		return $processor->get_updated_html();
+	}
+
+	/**
+	 * Reads an SVG file and drops everything ahead of its root element.
+	 *
+	 * Returns '' when the file is unreadable or the root element is not an
+	 * svg tag. A DOCTYPE with an internal subset is left in place, so files
+	 * declaring entities are rejected: HTML never expands them.
+	 *
+	 * @param string $path Absolute path to the SVG file.
+	 * @return string SVG markup starting at the root element, or ''.
+	 */
+	private static function read( string $path ): string {
+		if ( ! is_file( $path ) || ! is_readable( $path ) ) {
+			return '';
+		}
+
+		$svg = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		if ( ! is_string( $svg ) || '' === $svg ) {
+			return '';
+		}
+
+		$svg = preg_replace( '/^(?:\xEF\xBB\xBF|\s+|<\?xml[^>]*\?>|<!DOCTYPE[^\[>]*>|<!--.*?-->)+/is', '', $svg );
+
+		if ( ! is_string( $svg ) || 1 !== preg_match( '/^<svg[\s\/>]/i', $svg ) ) {
+			return '';
+		}
+
+		return $svg;
 	}
 }

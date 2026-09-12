@@ -73,6 +73,10 @@ HappyPrime\ThemeImageBlock\register_theme_image_style(
 );
 </code></pre>
 
+## Security
+
+Inline SVG output is the theme file as shipped, with accessibility and sizing attributes added to the root element. Nothing is sanitized: a script, event handler or `<foreignObject>` in a theme SVG runs on the page. Only files inside the parent theme directory can be registered, and only PHP can register them, so the theme is the trust boundary.
+
 ## Changelog
 
 ### 1.1.1

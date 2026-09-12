@@ -70,10 +70,47 @@ class Test_SVG extends WP_UnitTestCase {
 	 * Test get returns empty string for nonexistent file.
 	 */
 	public function test_get_returns_empty_for_nonexistent_file(): void {
-		// Suppress the warning since we're testing error handling.
-		$result = @SVG::get( '/nonexistent/file.svg' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$result = SVG::get( '/nonexistent/file.svg' );
 
 		$this->assertSame( '', $result );
+	}
+
+	/**
+	 * Test get strips the XML prolog, comments and DOCTYPE ahead of the root.
+	 */
+	public function test_get_strips_prolog_comment_and_doctype(): void {
+		$result = SVG::get( __DIR__ . '/fixtures/svg/svg-with-prolog-and-doctype.svg' );
+
+		$this->assertStringStartsWith( '<svg', $result );
+		$this->assertStringNotContainsString( '<?xml', $result );
+		$this->assertStringNotContainsString( '<!DOCTYPE', $result );
+		$this->assertStringNotContainsString( '<!--', $result );
+		$this->assertStringContainsString( '<title>Prolog</title>', $result );
+	}
+
+	/**
+	 * Test get strips a BOM and leading whitespace ahead of the root.
+	 */
+	public function test_get_strips_bom_and_leading_whitespace(): void {
+		file_put_contents( $this->test_svg_path, "\xEF\xBB\xBF\n\n  <svg><rect/></svg>" );
+
+		$this->assertStringStartsWith( '<svg', SVG::get( $this->test_svg_path ) );
+	}
+
+	/**
+	 * Test get returns empty for a DOCTYPE that declares entities.
+	 */
+	public function test_get_returns_empty_for_doctype_with_entities(): void {
+		$this->assertSame( '', SVG::get( __DIR__ . '/fixtures/svg/svg-entities.svg' ) );
+	}
+
+	/**
+	 * Test get returns empty when the root element is not svg.
+	 */
+	public function test_get_returns_empty_when_root_is_not_svg(): void {
+		file_put_contents( $this->test_svg_path, '<div><svg><rect/></svg></div>' );
+
+		$this->assertSame( '', SVG::get( $this->test_svg_path ) );
 	}
 
 	/**
