@@ -102,6 +102,23 @@ Inline SVG output is the theme file as shipped, with accessibility and sizing at
 
 ## Changelog
 
+### 1.2.0
+
+* Fix the inline SVG `aria-label` being double-escaped on WordPress 7.0 and later.
+* Decide SVG inlining by file extension, so exports that open with a comment inline and the block no longer needs the fileinfo extension.
+* Inline only the `svg` element: the XML prolog, DOCTYPE and leading comments are dropped, and a file declaring entities falls back to an `img`.
+* Merge style dimensions into an SVG's existing root `style` attribute and remove its `aria-hidden` when a label is set.
+* Render the registered `caption` when the block caption is empty.
+* Build `srcset` from integer pixel widths only, once per file, never for SVG, and emit `sizes` only alongside it.
+* Drop image variations whose file is missing or outside the theme.
+* Add `width` and `height` to the `img` so browsers reserve space and core can lazy-load it.
+* Limit the link `target` to browsing context keywords and add `noopener` for `_blank`.
+* Reject registrations with a null byte, a directory, or a path in a sibling directory; keep file names with `%`, spaces or unicode intact and encode them in URLs.
+* Emit a `_doing_it_wrong()` notice under `WP_DEBUG` when a registration is rejected.
+* Replace the deprecated `__experimentalLinkControl` and adopt the current control sizing in the editor.
+* Register the block from `blocks/build`; the block style is now cache-busted by the plugin version.
+* Declare `Requires at least: 6.8` and `Requires PHP: 7.4` in the plugin header.
+
 ### 1.1.1
 
 * Prevent fatal error on activation.

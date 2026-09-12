@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Theme Image Block
  * Description:       Use images from your theme as blocks in content.
- * Version:           1.1.1
+ * Version:           1.2.0
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Author:            Happy Prime
