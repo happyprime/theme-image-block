@@ -103,6 +103,23 @@ test.describe( 'Link, caption and alt text', () => {
 		);
 	} );
 
+	test( 'the registered caption renders when the block caption is empty', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await withThemeImagePost(
+			requestUtils,
+			{ themeImage: 'animated', showCaption: true },
+			async ( post ) => {
+				await page.goto( post.link );
+
+				await expect( page.locator( `${ FIGURE } figcaption` ) ).toHaveText(
+					IMAGES.animated.caption
+				);
+			}
+		);
+	} );
+
 	test( 'custom alt text overrides the registered default', async ( {
 		page,
 		requestUtils,
@@ -139,7 +156,7 @@ test.describe( 'Link, caption and alt text', () => {
 		);
 	} );
 
-	test( 'target _blank without a rel is rendered as given', async ( {
+	test( 'target _blank without a rel gains noopener', async ( {
 		page,
 		requestUtils,
 	} ) => {
@@ -151,8 +168,41 @@ test.describe( 'Link, caption and alt text', () => {
 
 				const link = page.locator( `${ FIGURE } > a` );
 				await expect( link ).toHaveAttribute( 'target', '_blank' );
-				// The block does not force noopener; hand-edited markup can omit it.
-				await expect( link ).not.toHaveAttribute( 'rel' );
+				await expect( link ).toHaveAttribute( 'rel', 'noopener' );
+			}
+		);
+	} );
+
+	test( 'a target that is not a browsing context keyword is dropped', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await withThemeImagePost(
+			requestUtils,
+			{ themeImage: 'alpha', linkUrl: 'https://example.com/', linkTarget: 'popup' },
+			async ( post ) => {
+				await page.goto( post.link );
+
+				const link = page.locator( `${ FIGURE } > a` );
+				await expect( link ).toHaveAttribute( 'href', 'https://example.com/' );
+				await expect( link ).not.toHaveAttribute( 'target' );
+			}
+		);
+	} );
+
+	test( 'the displayed file\'s pixel dimensions become width and height', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await withThemeImagePost(
+			requestUtils,
+			{ themeImage: 'tetons', imageSize: 'medium' },
+			async ( post ) => {
+				await page.goto( post.link );
+
+				const img = page.locator( `${ FIGURE } img` );
+				await expect( img ).toHaveAttribute( 'width', '800' );
+				await expect( img ).toHaveAttribute( 'height', '641' );
 			}
 		);
 	} );
@@ -270,7 +320,8 @@ test.describe( 'Link, caption and alt text', () => {
 			await editor.clickBlockToolbarButton( 'Add caption' );
 			const figcaption = block.locator( 'figcaption' );
 			await expect( figcaption ).toBeVisible();
-			// The registered caption is only a placeholder, never content.
+			// The registered caption is the placeholder; the front end renders
+			// it when nothing is typed.
 			await expect( figcaption ).toHaveAttribute(
 				'aria-label',
 				IMAGES.animated.caption

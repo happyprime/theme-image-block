@@ -23,7 +23,7 @@ class StyleRegistry {
 	private static array $styles = array();
 
 	/**
-	 * Register a theme image style.
+	 * Registers a theme image style.
 	 *
 	 * @param string               $slug Unique identifier for the style.
 	 * @param array<string, mixed> $args {
@@ -37,15 +37,22 @@ class StyleRegistry {
 	 * @return bool True if registered successfully, false otherwise.
 	 */
 	public static function register( string $slug, array $args ): bool {
-		if ( empty( $slug ) || empty( $args['name'] ) ) {
+		$slug = sanitize_key( $slug );
+
+		if ( '' === $slug ) {
+			self::warn( __( 'The style slug sanitizes to an empty string.', 'theme-image-block' ) );
 			return false;
 		}
 
-		// Sanitize the slug.
-		$slug = sanitize_key( $slug );
+		if ( empty( $args['name'] ) ) {
+			/* translators: %s: style slug */
+			self::warn( sprintf( __( 'Style "%s" needs a name.', 'theme-image-block' ), $slug ) );
+			return false;
+		}
 
-		// This style is already registered.
 		if ( self::has( $slug ) ) {
+			/* translators: %s: style slug */
+			self::warn( sprintf( __( 'Style "%s" is already registered.', 'theme-image-block' ), $slug ) );
 			return false;
 		}
 
@@ -147,6 +154,15 @@ class StyleRegistry {
 		}
 
 		return $styles;
+	}
+
+	/**
+	 * Reports a rejected registration under WP_DEBUG.
+	 *
+	 * @param string $message Why the registration was rejected.
+	 */
+	private static function warn( string $message ): void {
+		_doing_it_wrong( __CLASS__ . '::register', esc_html( $message ), '1.2.0' );
 	}
 
 	/**

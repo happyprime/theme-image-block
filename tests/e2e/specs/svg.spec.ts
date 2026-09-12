@@ -132,10 +132,6 @@ test.describe( 'SVG', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'K1: Block::render decides SVG-ness with mime_content_type(), which reports text/plain for a file that starts with a comment, so inlineSVG falls back to <img>.'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'exported', inlineSVG: true },
@@ -154,10 +150,6 @@ test.describe( 'SVG', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'C1: Block::render pre-escapes alt with esc_attr() and WordPress 7.1 set_attribute() escapes again, so aria-label reads "Tom&#039;s &quot;logo&quot; &amp; co".'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'flag', inlineSVG: true, altText: IMAGES.exported.alt },
@@ -177,10 +169,6 @@ test.describe( 'SVG', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'K2: SVG::get() replaces an existing root style attribute instead of merging; the editor preview merges, so the two drift.'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'prolog', inlineSVG: true, imageStyle: 'thumb' },

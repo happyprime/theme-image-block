@@ -274,12 +274,10 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 
 	/**
 	 * Registration returns a bool, never throws, and stores only resolvable paths.
-	 *
-	 * Known findings are excluded from the loop and pinned by the dedicated
-	 * tests below: null bytes (S7), slugs that sanitize to '' (K11), paths
-	 * that sanitize_text_field() changes (K12).
 	 */
 	public function test_register_never_throws_and_stores_resolvable_paths(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$registered = array();
 		$true_count = 0;
 
@@ -292,13 +290,6 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 			$slug = $this->random_slug();
 			$args = $this->random_args();
 
-			if ( false !== strpos( $slug, "\0" ) || '' === sanitize_key( $slug ) ) {
-				continue;
-			}
-			if ( isset( $args['path'] ) && is_string( $args['path'] ) && sanitize_text_field( $args['path'] ) !== $args['path'] ) {
-				continue;
-			}
-
 			$input = array( 'slug' => $slug, 'args' => $args );
 
 			try {
@@ -310,6 +301,11 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 			$this->assertIsBool( $result, $this->replay( $i, $input, 'register() did not return a bool' ) );
 
 			$key = sanitize_key( $slug );
+
+			if ( '' === $key ) {
+				$this->assertFalse( $result, $this->replay( $i, $input, 'a slug that sanitizes to nothing was registered' ) );
+			}
+			$this->assertArrayNotHasKey( '', Registry::get_all(), $this->replay( $i, $input, 'an image is stored under the empty slug' ) );
 
 			if ( ! $result ) {
 				if ( ! isset( $registered[ $key ] ) ) {
@@ -327,17 +323,25 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 			$real = realpath( $this->theme . '/' . $stored['path'] );
 			$this->assertNotFalse( $real, $this->replay( $i, $input, 'stored path does not resolve: ' . $stored['path'] ) );
 			$this->assertStringStartsWith( $this->theme . '/', $real, $this->replay( $i, $input, 'stored path resolves outside the theme: ' . $real ) );
+			$this->assertTrue( is_file( $real ), $this->replay( $i, $input, 'stored path is not a file: ' . $real ) );
+			$this->assertSame( $real, realpath( $this->theme . '/' . $args['path'] ), $this->replay( $i, $input, 'stored path resolves to a different file than the registered one' ) );
 
-			foreach ( array( 'title', 'description', 'alt', 'caption', 'path', 'width', 'height', 'max_width', 'max_height', 'sizes' ) as $field ) {
+			$this->assertIsString( $stored['path'] );
+			foreach ( array( 'title', 'description', 'alt', 'caption', 'width', 'height', 'max_width', 'max_height', 'sizes' ) as $field ) {
 				$this->assertIsString( $stored[ $field ], $this->replay( $i, $input, "stored $field is not a string" ) );
 				$this->assertSame( sanitize_text_field( $stored[ $field ] ), $stored[ $field ], $this->replay( $i, $input, "stored $field is not sanitize_text_field() stable" ) );
 			}
 			$this->assertIsArray( $stored['variations'] );
+			$this->assertArrayNotHasKey( '', $stored['variations'], $this->replay( $i, $input, 'a variation is stored under the empty key' ) );
 			foreach ( $stored['variations'] as $size => $variation ) {
 				$this->assertSame( array( 'name', 'path', 'width', 'height' ), array_keys( $variation ), $this->replay( $i, $input, 'variation keys drifted' ) );
-				foreach ( $variation as $field => $value ) {
-					$this->assertSame( sanitize_text_field( $value ), $value, $this->replay( $i, $input, "variation $size.$field is not sanitize_text_field() stable" ) );
+				foreach ( array( 'name', 'width', 'height' ) as $field ) {
+					$this->assertSame( sanitize_text_field( $variation[ $field ] ), $variation[ $field ], $this->replay( $i, $input, "variation $size.$field is not sanitize_text_field() stable" ) );
 				}
+				$real = realpath( $this->theme . '/' . $variation['path'] );
+				$this->assertNotFalse( $real, $this->replay( $i, $input, "variation $size path does not resolve: {$variation['path']}" ) );
+				$this->assertStringStartsWith( $this->theme . '/', $real, $this->replay( $i, $input, "variation $size resolves outside the theme: $real" ) );
+				$this->assertTrue( is_file( $real ), $this->replay( $i, $input, "variation $size is not a file: $real" ) );
 			}
 
 			$json = wp_json_encode( Registry::get_for_editor() );
@@ -351,6 +355,8 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	 * Style registration returns a bool and stores sanitize_text_field() stable strings.
 	 */
 	public function test_style_register_never_throws(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\StyleRegistry::register' );
+
 		for ( $i = 0; $i < $this->runs; $i++ ) {
 			if ( $this->chance( 10 ) ) {
 				StyleRegistry::clear();
@@ -364,10 +370,6 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 				}
 			}
 
-			if ( '' === sanitize_key( $slug ) ) {
-				continue;
-			}
-
 			$input = array( 'slug' => $slug, 'args' => $args );
 
 			try {
@@ -377,6 +379,10 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 			}
 
 			$this->assertIsBool( $result );
+			if ( '' === sanitize_key( $slug ) ) {
+				$this->assertFalse( $result, $this->replay( $i, $input, 'a slug that sanitizes to nothing was registered' ) );
+			}
+			$this->assertArrayNotHasKey( '', StyleRegistry::get_all(), $this->replay( $i, $input, 'a style is stored under the empty slug' ) );
 			if ( ! $result ) {
 				continue;
 			}
@@ -394,82 +400,70 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	 * A symlink inside the theme that points outside is rejected.
 	 */
 	public function test_symlink_outside_theme_is_rejected(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$this->assertFalse( Registry::register( 'out', array( 'title' => 'Out', 'path' => 'images/link-outside.jpg' ) ) );
 	}
 
 	/**
 	 * A null byte in the path returns false instead of throwing.
-	 *
-	 * S7: realpath() throws ValueError on PHP 8 before the registry checks anything.
 	 */
 	public function test_null_byte_in_path_returns_false(): void {
-		try {
-			$result = Registry::register( 'nul', array( 'title' => 'Nul', 'path' => "images/tiny.jpg\0.png" ) );
-		} catch ( \ValueError $e ) {
-			$this->markTestIncomplete( 'S7: Registry::register() lets realpath() throw on a null byte: ' . $e->getMessage() );
-		}
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		$this->assertFalse( $result );
+		$this->assertFalse( Registry::register( 'nul', array( 'title' => 'Nul', 'path' => "images/tiny.jpg\0.png" ) ) );
 	}
 
 	/**
 	 * A sibling directory sharing the theme's name as a prefix is rejected.
-	 *
-	 * S2: the containment check compares against the theme path without a trailing slash.
 	 */
 	public function test_sibling_directory_with_shared_prefix_is_rejected(): void {
-		$path   = '../' . basename( $this->theme ) . '-evil/images/x.svg';
-		$result = Registry::register( 'evil', array( 'title' => 'Evil', 'path' => $path ) );
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		if ( $result ) {
-			$this->markTestIncomplete( "S2: Registry::register() accepted $path, which resolves to a sibling of the theme directory." );
-		}
+		$path = '../' . basename( $this->theme ) . '-evil/images/x.svg';
 
-		$this->assertFalse( $result );
+		$this->assertFalse( Registry::register( 'evil', array( 'title' => 'Evil', 'path' => $path ) ) );
 	}
 
 	/**
 	 * A directory is not an image.
 	 */
 	public function test_directory_path_is_rejected(): void {
-		$result = Registry::register( 'dir', array( 'title' => 'Dir', 'path' => 'images' ) );
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		if ( $result ) {
-			$this->markTestIncomplete( 'Registry::register() accepts a directory as an image path (file_exists() is true for directories).' );
-		}
-
-		$this->assertFalse( $result );
+		$this->assertFalse( Registry::register( 'dir', array( 'title' => 'Dir', 'path' => 'images' ) ) );
 	}
 
 	/**
 	 * A file name with a percent-encoded octet round-trips through the registry.
-	 *
-	 * K12: the path is validated raw but stored after sanitize_text_field(), which strips %20.
 	 */
 	public function test_percent_encoded_filename_round_trips(): void {
 		$this->assertTrue( Registry::register( 'pct', array( 'title' => 'Pct', 'path' => 'images/my%20logo.svg' ) ) );
 
-		$stored = Registry::get( 'pct' )['path'];
-		if ( ! realpath( $this->theme . '/' . $stored ) ) {
-			$this->markTestIncomplete( "K12: registered images/my%20logo.svg but stored '$stored', which does not exist." );
-		}
+		$this->assertSame( 'images/my%20logo.svg', Registry::get( 'pct' )['path'] );
+	}
 
-		$this->assertSame( 'images/my%20logo.svg', $stored );
+	/**
+	 * A stored path is the on-disk path, without `..` segments or symlinks.
+	 */
+	public function test_stored_path_is_normalized(): void {
+		$this->assertTrue( Registry::register( 'dots', array( 'title' => 'Dots', 'path' => 'images/../images/tiny.jpg' ) ) );
+		$this->assertSame( 'images/tiny.jpg', Registry::get( 'dots' )['path'] );
+
+		$this->assertTrue( Registry::register( 'link', array( 'title' => 'Link', 'path' => 'images/link-inside.jpg' ) ) );
+		$this->assertSame( 'images/tiny.jpg', Registry::get( 'link' )['path'] );
+
+		$this->assertTrue( Registry::register( 'uni', array( 'title' => 'Uni', 'path' => 'images/ünïcödé-名前-🙂.jpg' ) ) );
+		$this->assertSame( 'images/ünïcödé-名前-🙂.jpg', Registry::get( 'uni' )['path'] );
 	}
 
 	/**
 	 * A slug that sanitizes to nothing is rejected.
-	 *
-	 * K11: emptiness is checked before sanitize_key(), so '!!!' registers under ''.
 	 */
 	public function test_slug_of_only_punctuation_is_rejected(): void {
-		$result = Registry::register( '!!!', array( 'title' => 'Bang', 'path' => 'images/tiny.jpg' ) );
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		if ( $result ) {
-			$this->markTestIncomplete( "K11: Registry::register( '!!!' ) returned true and stored the image under the key ''." );
-		}
-
-		$this->assertFalse( $result );
+		$this->assertFalse( Registry::register( '!!!', array( 'title' => 'Bang', 'path' => 'images/tiny.jpg' ) ) );
 		$this->assertArrayNotHasKey( '', Registry::get_all() );
 	}
 
@@ -477,21 +471,18 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	 * Same as above for styles.
 	 */
 	public function test_style_slug_of_only_punctuation_is_rejected(): void {
-		$result = StyleRegistry::register( '!!!', array( 'name' => 'Bang' ) );
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\StyleRegistry::register' );
 
-		if ( $result ) {
-			$this->markTestIncomplete( "K11: StyleRegistry::register( '!!!' ) returned true and stored the style under the key ''." );
-		}
-
-		$this->assertFalse( $result );
+		$this->assertFalse( StyleRegistry::register( '!!!', array( 'name' => 'Bang' ) ) );
+		$this->assertArrayNotHasKey( '', StyleRegistry::get_all() );
 	}
 
 	/**
 	 * Variation paths get the same containment check as the main path.
-	 *
-	 * S3/K5: sanitize_variations() only runs sanitize_text_field() on the path.
 	 */
 	public function test_variation_path_outside_theme_is_dropped(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$this->assertTrue(
 			Registry::register(
 				'vars',
@@ -507,18 +498,6 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 				)
 			)
 		);
-
-		$bad = array();
-		foreach ( Registry::get( 'vars' )['variations'] as $size => $variation ) {
-			$real = realpath( $this->theme . '/' . $variation['path'] );
-			if ( ! $real || 0 !== strpos( $real, $this->theme . '/' ) ) {
-				$bad[] = "$size => {$variation['path']}";
-			}
-		}
-
-		if ( $bad ) {
-			$this->markTestIncomplete( 'S3/K5: variations stored without a containment or existence check: ' . implode( ', ', $bad ) );
-		}
 
 		$this->assertSame( array( 'ok' ), array_keys( Registry::get( 'vars' )['variations'] ) );
 	}

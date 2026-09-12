@@ -50,6 +50,8 @@ class Test_StyleRegistry extends WP_UnitTestCase {
 	 * Test registering style without name returns false.
 	 */
 	public function test_register_without_name_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\StyleRegistry::register' );
+
 		$result = StyleRegistry::register(
 			'hero',
 			array(
@@ -65,6 +67,8 @@ class Test_StyleRegistry extends WP_UnitTestCase {
 	 * Test registering style with empty slug returns false.
 	 */
 	public function test_register_with_empty_slug_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\StyleRegistry::register' );
+
 		$result = StyleRegistry::register(
 			'',
 			array(
@@ -81,6 +85,8 @@ class Test_StyleRegistry extends WP_UnitTestCase {
 	 * Test registering duplicate slug returns false.
 	 */
 	public function test_register_duplicate_slug_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\StyleRegistry::register' );
+
 		StyleRegistry::register(
 			'hero',
 			array(

@@ -79,15 +79,6 @@ add_action(
 			]
 		);
 
-		// Rejected by the registry: the file does not exist.
-		register_theme_image(
-			'missing',
-			[
-				'title' => 'Missing File',
-				'path'  => 'images/does-not-exist.jpg',
-			]
-		);
-
 		register_theme_image(
 			'animated',
 			[
@@ -123,6 +114,19 @@ add_action(
 			]
 		);
 
+		// The registry rejects these on purpose; under WP_DEBUG the notice
+		// would print ahead of the response headers and break logins.
+		add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
+
+		// The file does not exist.
+		register_theme_image(
+			'missing',
+			[
+				'title' => 'Missing File',
+				'path'  => 'images/does-not-exist.jpg',
+			]
+		);
+
 		// One variation file is missing and one width is not a pixel count.
 		register_theme_image(
 			'brokenvars',
@@ -145,6 +149,8 @@ add_action(
 				],
 			]
 		);
+
+		remove_filter( 'doing_it_wrong_trigger_error', '__return_false' );
 
 		register_theme_image_style(
 			'hero',

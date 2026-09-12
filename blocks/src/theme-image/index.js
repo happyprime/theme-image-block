@@ -6,7 +6,7 @@ import {
 	useBlockProps,
 	BlockControls,
 	BlockIcon,
-	__experimentalLinkControl as LinkControl,
+	LinkControl,
 	RichText,
 } from '@wordpress/block-editor';
 import { registerBlockType } from '@wordpress/blocks';
@@ -54,9 +54,12 @@ function Edit({ attributes, setAttributes }) {
 	const [isEditingLink, setIsEditingLink] = useState(false);
 	const blockRef = useRef();
 
-	// Get registered theme images and styles from localized data.
-	const registeredImages = happyprime_themeimageblock_data?.images || [];
-	const registeredStyles = happyprime_themeimageblock_data?.styles || [];
+	// Optional chaining alone would still throw a ReferenceError for a
+	// missing global, so read it off window.
+	const data = window.happyprime_themeimageblock_data;
+	const registeredImages = data?.images || [];
+	const registeredStyles = data?.styles || [];
+	const themeUrl = data?.themeUrl || '';
 
 	// Build the options array for the SelectControl.
 	const themeImages = [
@@ -105,7 +108,7 @@ function Edit({ attributes, setAttributes }) {
 			imagePath &&
 			imagePath.toLowerCase().endsWith('.svg')
 		) {
-			const svgUrl = `${happyprime_themeimageblock_data.themeUrl}/${imagePath}`;
+			const svgUrl = `${themeUrl}/${imagePath}`;
 			fetch(svgUrl)
 				.then((response) => response.text())
 				.then((svg) => {
@@ -118,17 +121,14 @@ function Edit({ attributes, setAttributes }) {
 		} else {
 			setSvgContent(null);
 		}
-	}, [inlineSVG, imagePath]);
+	}, [inlineSVG, imagePath, themeUrl]);
 
 	const blockProps = useBlockProps({
 		ref: blockRef,
 		className: inlineSVG ? 'has-inline-svg' : '',
 	});
 
-	const imageUrl =
-		imagePath && happyprime_themeimageblock_data?.themeUrl
-			? `${happyprime_themeimageblock_data.themeUrl}/${imagePath}`
-			: '';
+	const imageUrl = imagePath && themeUrl ? `${themeUrl}/${imagePath}` : '';
 	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
 	// Get the selected style's dimensions.
@@ -275,7 +275,7 @@ function Edit({ attributes, setAttributes }) {
 
 			{isEditingLink && (
 				<Popover
-					position="bottom center"
+					placement="bottom"
 					onClose={() => setIsEditingLink(false)}
 					anchor={blockRef.current}
 				>
@@ -338,6 +338,8 @@ function Edit({ attributes, setAttributes }) {
 					initialOpen={true}
 				>
 					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Theme Image', 'theme-image-block')}
 						value={themeImage}
 						options={themeImages}
@@ -357,6 +359,8 @@ function Edit({ attributes, setAttributes }) {
 						currentImage.variations &&
 						Object.keys(currentImage.variations).length > 0 && (
 							<SelectControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
 								label={__('Variation', 'theme-image-block')}
 								value={imageSize}
 								options={sizeOptions}
@@ -371,6 +375,8 @@ function Edit({ attributes, setAttributes }) {
 						)}
 
 					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Style', 'theme-image-block')}
 						value={imageStyle}
 						options={[
@@ -394,6 +400,7 @@ function Edit({ attributes, setAttributes }) {
 
 					{isSVG && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={__('Inline SVG', 'theme-image-block')}
 							checked={inlineSVG}
 							onChange={(value) =>
@@ -408,6 +415,8 @@ function Edit({ attributes, setAttributes }) {
 
 					{!omitAltText && (
 						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 							label={__('Alt Text', 'theme-image-block')}
 							value={altText}
 							onChange={(value) =>
@@ -422,6 +431,7 @@ function Edit({ attributes, setAttributes }) {
 					)}
 
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={__('Omit alt text', 'theme-image-block')}
 						checked={omitAltText}
 						onChange={(value) =>

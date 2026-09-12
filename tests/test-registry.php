@@ -29,6 +29,7 @@ class Test_Registry extends WP_UnitTestCase {
 
 		// Create a test image file.
 		file_put_contents( $theme_dir . '/images/test.jpg', 'fake image content' );
+		file_put_contents( $theme_dir . '/images/test-large.jpg', 'fake image content' );
 		file_put_contents( $theme_dir . '/images/test.svg', '<svg></svg>' );
 	}
 
@@ -42,6 +43,9 @@ class Test_Registry extends WP_UnitTestCase {
 		$theme_dir = get_template_directory();
 		if ( file_exists( $theme_dir . '/images/test.jpg' ) ) {
 			unlink( $theme_dir . '/images/test.jpg' );
+		}
+		if ( file_exists( $theme_dir . '/images/test-large.jpg' ) ) {
+			unlink( $theme_dir . '/images/test-large.jpg' );
 		}
 		if ( file_exists( $theme_dir . '/images/test.svg' ) ) {
 			unlink( $theme_dir . '/images/test.svg' );
@@ -72,6 +76,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image without title returns false.
 	 */
 	public function test_register_without_title_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -86,6 +92,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image without path returns false.
 	 */
 	public function test_register_without_path_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -100,6 +108,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image with empty slug returns false.
 	 */
 	public function test_register_with_empty_slug_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'',
 			array(
@@ -115,6 +125,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering non-existent file returns false.
 	 */
 	public function test_register_nonexistent_file_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -130,6 +142,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering image with path traversal returns false.
 	 */
 	public function test_register_with_path_traversal_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		$result = Registry::register(
 			'test-image',
 			array(
@@ -145,6 +159,8 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test registering duplicate slug returns false.
 	 */
 	public function test_register_duplicate_slug_returns_false(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
 		Registry::register(
 			'test-image',
 			array(
@@ -350,6 +366,35 @@ class Test_Registry extends WP_UnitTestCase {
 		$image = Registry::get( 'test-image' );
 
 		$this->assertSame( 'Large Size', $image['variations']['large']['name'] );
+	}
+
+	/**
+	 * Test a variation whose file is missing is dropped.
+	 */
+	public function test_register_drops_variation_with_missing_file(): void {
+		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
+
+		Registry::register(
+			'test-image',
+			array(
+				'title'      => 'Test Image',
+				'path'       => 'images/test.jpg',
+				'variations' => array(
+					'large'   => array(
+						'path'  => 'images/test-large.jpg',
+						'width' => '1024',
+					),
+					'missing' => array(
+						'path'  => 'images/nonexistent.jpg',
+						'width' => '2048',
+					),
+				),
+			)
+		);
+
+		$image = Registry::get( 'test-image' );
+
+		$this->assertSame( array( 'large' ), array_keys( $image['variations'] ) );
 	}
 
 	/**

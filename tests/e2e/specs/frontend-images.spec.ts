@@ -64,10 +64,6 @@ test.describe( 'Front end image URLs', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			'K5/S3: Registry::sanitize_variations() never checks that a variation file exists, so images/tetons-ghost.jpg is emitted as a 1200w candidate and returns 404.'
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'brokenvars' },
@@ -89,10 +85,6 @@ test.describe( 'Front end image URLs', () => {
 		page,
 		requestUtils,
 	} ) => {
-		test.fixme(
-			true,
-			"K4: Block::render casts variation widths with (int), so a registered width of '10rem' becomes a 10w srcset descriptor."
-		);
 		await withThemeImagePost(
 			requestUtils,
 			{ themeImage: 'brokenvars' },

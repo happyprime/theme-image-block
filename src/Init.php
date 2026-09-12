@@ -24,11 +24,11 @@ class Init {
 	}
 
 	/**
-	 * Register the theme image block.
+	 * Registers the theme image block from the built block.json.
 	 */
 	public static function register_block(): void {
 		register_block_type_from_metadata(
-			BLOCKS_DIR . '/src/theme-image/block.json',
+			BLOCKS_DIR . '/build/theme-image/block.json',
 			array(
 				'render_callback' => [ Block::class, 'render' ],
 			)

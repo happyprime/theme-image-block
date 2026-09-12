@@ -106,12 +106,12 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 					continue;
 				}
 
-				if ( ! self::has_svg_tag( $input ) ) {
-					// No root tag to decorate, so the bytes pass through untouched.
-					$this->assertSame( $input, $output, "$name: passthrough without an svg tag" );
+				if ( ! self::has_svg_tag( $input ) || 'svg-entities.svg' === $name ) {
+					$this->assertSame( '', $output, "$name: nothing to inline" );
 					continue;
 				}
 
+				$this->assertStringStartsWith( '<svg', $output, "$name: output starts at the root element" );
 				$this->assert_a11y( $output, $alt, "$name (alt '$alt')" );
 			}
 		}
@@ -134,11 +134,9 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 	}
 
 	/**
-	 * A width replaces an existing root style attribute; without one it is kept.
-	 *
-	 * K2: the editor preview merges the two, so the front end drifts from it.
+	 * Dimensions are appended to an existing root style attribute.
 	 */
-	public function test_existing_root_style_is_replaced_by_dimensions(): void {
+	public function test_existing_root_style_is_merged_with_dimensions(): void {
 		$file = __DIR__ . '/fixtures/svg/svg-with-prolog-and-doctype.svg';
 
 		$processor = new WP_HTML_Tag_Processor( SVG::get( $file ) );
@@ -147,14 +145,11 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 
 		$processor = new WP_HTML_Tag_Processor( SVG::get( $file, array( 'width' => '10rem', 'max_height' => '5rem' ) ) );
 		$processor->next_tag( array( 'tag_name' => 'svg' ) );
-		$this->assertSame( 'width: 10rem; max-height: 5rem', $processor->get_attribute( 'style' ) );
+		$this->assertSame( 'border: 1px solid red; width: 10rem; max-height: 5rem', $processor->get_attribute( 'style' ) );
 	}
 
 	/**
 	 * A labelled SVG must not keep an aria-hidden="true" from the file.
-	 *
-	 * K15: set_attribute() overwrites role and aria-label but nothing removes
-	 * aria-hidden, so the SVG stays hidden from assistive tech despite the label.
 	 */
 	public function test_existing_aria_hidden_is_removed_when_labelled(): void {
 		$file = $this->scratch . '/hidden.svg';
@@ -166,11 +161,6 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 		$this->assertSame( 'img', $processor->get_attribute( 'role' ) );
 		$this->assertSame( 'Labelled', $processor->get_attribute( 'aria-label' ) );
 		$this->assertSame( 'false', $processor->get_attribute( 'focusable' ) );
-
-		if ( 'true' === $processor->get_attribute( 'aria-hidden' ) ) {
-			$this->markTestIncomplete( 'K15: SVG::get() sets role="img" and aria-label but leaves the file\'s aria-hidden="true" in place.' );
-		}
-
 		$this->assertNull( $processor->get_attribute( 'aria-hidden' ) );
 	}
 
@@ -254,14 +244,19 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 			$this->assertIsString( $output );
 			$this->assertLessThanOrEqual( strlen( $svg ) + 1024 + 8 * strlen( $alt ), strlen( $output ), $this->replay( $i, $input, 'output grew more than the added attributes explain' ) );
 
-			if ( '' === $svg || ! self::has_svg_tag( $svg ) ) {
+			if ( '' === $output ) {
+				// A file that opens with its root element must always inline.
+				$opens_with_root = 1 === preg_match( '/^\s*<svg[\s\/>]/i', $svg ) && self::has_svg_tag( $svg );
+				$this->assertFalse( $opens_with_root, $this->replay( $i, $input, 'a file opening with <svg was not inlined' ) );
 				continue;
 			}
 
-			// A root that already carries role/aria-hidden is K15's case below.
+			$this->assertStringStartsWith( '<svg', $output, $this->replay( $i, $input, 'output does not start at the root element' ) );
+
+			// Without alt an existing role is left as the file set it.
 			$root = new WP_HTML_Tag_Processor( $svg );
 			$root->next_tag( array( 'tag_name' => 'svg' ) );
-			if ( null !== $root->get_attribute( 'role' ) || null !== $root->get_attribute( 'aria-hidden' ) ) {
+			if ( '' === $alt && null !== $root->get_attribute( 'role' ) ) {
 				continue;
 			}
 
