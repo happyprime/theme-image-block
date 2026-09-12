@@ -85,9 +85,10 @@ class Test_Block extends WP_UnitTestCase {
 		Registry::register(
 			'unsized',
 			array(
-				'title' => 'Unsized',
-				'path'  => 'images/photo.jpg',
-				'sizes' => '100vw',
+				'title'   => 'Unsized',
+				'path'    => 'images/photo.jpg',
+				'sizes'   => '100vw',
+				'caption' => 'Registered & <em>plain</em> caption',
 			)
 		);
 		Registry::register(
@@ -211,6 +212,20 @@ class Test_Block extends WP_UnitTestCase {
 
 		$this->assertArrayNotHasKey( 'srcset', $img );
 		$this->assertArrayNotHasKey( 'sizes', $img );
+	}
+
+	/**
+	 * Test the registered caption renders when the block has none.
+	 */
+	public function test_registered_caption_is_the_fallback(): void {
+		$html = $this->render( array( 'themeImage' => 'unsized', 'showCaption' => true ) );
+		$this->assertStringContainsString( '<figcaption>Registered &amp; plain caption</figcaption>', $html );
+
+		$html = $this->render( array( 'themeImage' => 'unsized', 'showCaption' => true, 'caption' => 'Typed <strong>caption</strong>' ) );
+		$this->assertStringContainsString( '<figcaption>Typed <strong>caption</strong></figcaption>', $html );
+
+		$html = $this->render( array( 'themeImage' => 'unsized', 'caption' => 'Typed' ) );
+		$this->assertStringNotContainsString( '<figcaption', $html );
 	}
 
 	/**

@@ -25,7 +25,7 @@ class Block {
 	 *     @type string $linkUrl     URL for wrapping the image in a link. Default empty string.
 	 *     @type string $linkTarget  Target attribute for the link (e.g., '_blank'). Default empty string.
 	 *     @type string $linkRel     Rel attribute for the link (e.g., 'nofollow'). Default empty string.
-	 *     @type string $caption     Caption text to display below the image. Default empty string.
+	 *     @type string $caption     Caption text to display below the image. Default the registered caption.
 	 *     @type bool   $showCaption Whether to display the caption. Default false.
 	 *     @type string $altText     Custom alt text to override the registered default. Default empty string.
 	 *     @type bool   $omitAltText Whether to omit alt text entirely. Default false.
@@ -181,7 +181,7 @@ class Block {
 
 		$content = $html->get_updated_html();
 
-		$caption = wp_kses_post( $attributes['caption'] );
+		$caption = wp_kses_post( '' !== $attributes['caption'] ? $attributes['caption'] : $image_data['caption'] );
 		if ( $attributes['showCaption'] && '' !== $caption ) {
 			$content .= sprintf( '<figcaption>%s</figcaption>', $caption );
 		}

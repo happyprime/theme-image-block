@@ -103,6 +103,23 @@ test.describe( 'Link, caption and alt text', () => {
 		);
 	} );
 
+	test( 'the registered caption renders when the block caption is empty', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await withThemeImagePost(
+			requestUtils,
+			{ themeImage: 'animated', showCaption: true },
+			async ( post ) => {
+				await page.goto( post.link );
+
+				await expect( page.locator( `${ FIGURE } figcaption` ) ).toHaveText(
+					IMAGES.animated.caption
+				);
+			}
+		);
+	} );
+
 	test( 'custom alt text overrides the registered default', async ( {
 		page,
 		requestUtils,
@@ -270,7 +287,8 @@ test.describe( 'Link, caption and alt text', () => {
 			await editor.clickBlockToolbarButton( 'Add caption' );
 			const figcaption = block.locator( 'figcaption' );
 			await expect( figcaption ).toBeVisible();
-			// The registered caption is only a placeholder, never content.
+			// The registered caption is the placeholder; the front end renders
+			// it when nothing is typed.
 			await expect( figcaption ).toHaveAttribute(
 				'aria-label',
 				IMAGES.animated.caption
