@@ -1,14 +1,16 @@
 <?php
 /**
- * Plugin Name:  Theme Image Block
- * Description:  Use images from your theme as blocks in content.
- * Version:      1.1.1
- * Author:       Happy Prime
- * Author URI:   https://happyprime.co
- * License:      GPL-2.0-or-later
- * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:  theme-image-block
- * Domain Path:  /languages
+ * Plugin Name:       Theme Image Block
+ * Description:       Use images from your theme as blocks in content.
+ * Version:           1.1.1
+ * Requires at least: 6.8
+ * Requires PHP:      7.4
+ * Author:            Happy Prime
+ * Author URI:        https://happyprime.co
+ * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       theme-image-block
+ * Domain Path:       /languages
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
