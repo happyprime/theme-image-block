@@ -45,12 +45,14 @@ module.exports = {
 	},
 	plugins: [
 		new DependencyExtractionWebpackPlugin(),
+		// block.json and style.css ship next to the built script so the
+		// block registers from blocks/build alone.
 		new CopyPlugin({
 			patterns: [
 				{
-					from: 'blocks/src/**/block.json',
+					from: 'blocks/src/**/{block.json,style.css}',
 					to({ context, absoluteFilename }) {
-						const srcDir = path.resolve(context, 'src');
+						const srcDir = path.resolve(context, 'blocks/src');
 						const relativeToSrc = path.relative(
 							srcDir,
 							absoluteFilename
@@ -58,7 +60,7 @@ module.exports = {
 						const dir = path.dirname(relativeToSrc);
 						return path.resolve(
 							context,
-							'build',
+							'blocks/build',
 							dir,
 							'[name][ext]'
 						);
