@@ -17,7 +17,9 @@ class Block {
 	/**
 	 * Renders the theme image block.
 	 *
-	 * @param array<string, mixed> $attributes Block attributes. {
+	 * @param array<string, mixed> $attributes {
+	 *     Block attributes.
+	 *
 	 *     @type string $themeImage  The slug of the theme image to display. Required.
 	 *     @type string $imageSize   The size variation to display. Default 'original'.
 	 *     @type string $imageStyle  The slug of the registered style to apply. Default empty string.

@@ -250,14 +250,25 @@ class Registry {
 			}
 
 			$sanitized[ $size ] = array(
-				'name'   => isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '',
+				'name'   => self::text_field( $data['name'] ?? '' ),
 				'path'   => $path,
-				'width'  => isset( $data['width'] ) ? sanitize_text_field( $data['width'] ) : '',
-				'height' => isset( $data['height'] ) ? sanitize_text_field( $data['height'] ) : '',
+				'width'  => self::text_field( $data['width'] ?? '' ),
+				'height' => self::text_field( $data['height'] ?? '' ),
 			);
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * Sanitizes a scalar as a text field and returns '' for anything else.
+	 *
+	 * Integer widths such as `400` are common in registrations.
+	 *
+	 * @param mixed $value Registered value.
+	 */
+	private static function text_field( $value ): string {
+		return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
 	}
 
 	/**

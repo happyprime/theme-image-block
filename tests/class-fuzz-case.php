@@ -36,8 +36,35 @@ abstract class Fuzz_Case extends WP_UnitTestCase {
 	 * @var string[]
 	 */
 	private const CHARS = array(
-		'a', 'b', 'Z', '0', '9', ' ', '-', '_', '.', '/', '\\', 'é', '名', '🙂',
-		'"', "'", '<', '>', '&', ';', ':', '(', ')', '%', "\n", "\t", '=', '#', '?',
+		'a',
+		'b',
+		'Z',
+		'0',
+		'9',
+		' ',
+		'-',
+		'_',
+		'.',
+		'/',
+		'\\',
+		'é',
+		'名',
+		'🙂',
+		'"',
+		"'",
+		'<',
+		'>',
+		'&',
+		';',
+		':',
+		'(',
+		')',
+		'%',
+		"\n",
+		"\t",
+		'=',
+		'#',
+		'?',
 	);
 
 	/**
@@ -46,8 +73,10 @@ abstract class Fuzz_Case extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->seed = (int) getenv( 'TIB_FUZZ_SEED' ) ?: 12345;
-		$this->runs = (int) getenv( 'TIB_FUZZ_RUNS' ) ?: 300;
+		$seed       = (int) getenv( 'TIB_FUZZ_SEED' );
+		$runs       = (int) getenv( 'TIB_FUZZ_RUNS' );
+		$this->seed = 0 !== $seed ? $seed : 12345;
+		$this->runs = 0 !== $runs ? $runs : 300;
 		mt_srand( $this->seed );
 
 		set_error_handler(

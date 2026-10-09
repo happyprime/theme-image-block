@@ -290,7 +290,10 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 			$slug = $this->random_slug();
 			$args = $this->random_args();
 
-			$input = array( 'slug' => $slug, 'args' => $args );
+			$input = array(
+				'slug' => $slug,
+				'args' => $args,
+			);
 
 			try {
 				$result = Registry::register( $slug, $args );
@@ -370,7 +373,10 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 				}
 			}
 
-			$input = array( 'slug' => $slug, 'args' => $args );
+			$input = array(
+				'slug' => $slug,
+				'args' => $args,
+			);
 
 			try {
 				$result = StyleRegistry::register( $slug, $args );
@@ -402,7 +408,15 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	public function test_symlink_outside_theme_is_rejected(): void {
 		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		$this->assertFalse( Registry::register( 'out', array( 'title' => 'Out', 'path' => 'images/link-outside.jpg' ) ) );
+		$this->assertFalse(
+			Registry::register(
+				'out',
+				array(
+					'title' => 'Out',
+					'path'  => 'images/link-outside.jpg',
+				)
+			)
+		);
 	}
 
 	/**
@@ -411,7 +425,15 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	public function test_null_byte_in_path_returns_false(): void {
 		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		$this->assertFalse( Registry::register( 'nul', array( 'title' => 'Nul', 'path' => "images/tiny.jpg\0.png" ) ) );
+		$this->assertFalse(
+			Registry::register(
+				'nul',
+				array(
+					'title' => 'Nul',
+					'path'  => "images/tiny.jpg\0.png",
+				)
+			)
+		);
 	}
 
 	/**
@@ -422,7 +444,15 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 
 		$path = '../' . basename( $this->theme ) . '-evil/images/x.svg';
 
-		$this->assertFalse( Registry::register( 'evil', array( 'title' => 'Evil', 'path' => $path ) ) );
+		$this->assertFalse(
+			Registry::register(
+				'evil',
+				array(
+					'title' => 'Evil',
+					'path'  => $path,
+				)
+			)
+		);
 	}
 
 	/**
@@ -431,14 +461,30 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	public function test_directory_path_is_rejected(): void {
 		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		$this->assertFalse( Registry::register( 'dir', array( 'title' => 'Dir', 'path' => 'images' ) ) );
+		$this->assertFalse(
+			Registry::register(
+				'dir',
+				array(
+					'title' => 'Dir',
+					'path'  => 'images',
+				)
+			)
+		);
 	}
 
 	/**
 	 * A file name with a percent-encoded octet round-trips through the registry.
 	 */
 	public function test_percent_encoded_filename_round_trips(): void {
-		$this->assertTrue( Registry::register( 'pct', array( 'title' => 'Pct', 'path' => 'images/my%20logo.svg' ) ) );
+		$this->assertTrue(
+			Registry::register(
+				'pct',
+				array(
+					'title' => 'Pct',
+					'path'  => 'images/my%20logo.svg',
+				)
+			)
+		);
 
 		$this->assertSame( 'images/my%20logo.svg', Registry::get( 'pct' )['path'] );
 	}
@@ -447,13 +493,37 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	 * A stored path is the on-disk path, without `..` segments or symlinks.
 	 */
 	public function test_stored_path_is_normalized(): void {
-		$this->assertTrue( Registry::register( 'dots', array( 'title' => 'Dots', 'path' => 'images/../images/tiny.jpg' ) ) );
+		$this->assertTrue(
+			Registry::register(
+				'dots',
+				array(
+					'title' => 'Dots',
+					'path'  => 'images/../images/tiny.jpg',
+				)
+			)
+		);
 		$this->assertSame( 'images/tiny.jpg', Registry::get( 'dots' )['path'] );
 
-		$this->assertTrue( Registry::register( 'link', array( 'title' => 'Link', 'path' => 'images/link-inside.jpg' ) ) );
+		$this->assertTrue(
+			Registry::register(
+				'link',
+				array(
+					'title' => 'Link',
+					'path'  => 'images/link-inside.jpg',
+				)
+			)
+		);
 		$this->assertSame( 'images/tiny.jpg', Registry::get( 'link' )['path'] );
 
-		$this->assertTrue( Registry::register( 'uni', array( 'title' => 'Uni', 'path' => 'images/ünïcödé-名前-🙂.jpg' ) ) );
+		$this->assertTrue(
+			Registry::register(
+				'uni',
+				array(
+					'title' => 'Uni',
+					'path'  => 'images/ünïcödé-名前-🙂.jpg',
+				)
+			)
+		);
 		$this->assertSame( 'images/ünïcödé-名前-🙂.jpg', Registry::get( 'uni' )['path'] );
 	}
 
@@ -463,7 +533,15 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 	public function test_slug_of_only_punctuation_is_rejected(): void {
 		$this->setExpectedIncorrectUsage( 'HappyPrime\ThemeImageBlock\Registry::register' );
 
-		$this->assertFalse( Registry::register( '!!!', array( 'title' => 'Bang', 'path' => 'images/tiny.jpg' ) ) );
+		$this->assertFalse(
+			Registry::register(
+				'!!!',
+				array(
+					'title' => 'Bang',
+					'path'  => 'images/tiny.jpg',
+				)
+			)
+		);
 		$this->assertArrayNotHasKey( '', Registry::get_all() );
 	}
 
@@ -490,10 +568,22 @@ class Test_Fuzz_Registry extends Fuzz_Case {
 					'title'      => 'Vars',
 					'path'       => 'images/tiny.jpg',
 					'variations' => array(
-						'ok'       => array( 'path' => 'images/plain.svg', 'width' => '100' ),
-						'missing'  => array( 'path' => 'images/missing.jpg', 'width' => '200' ),
-						'outside'  => array( 'path' => '../../../etc/passwd', 'width' => '300' ),
-						'external' => array( 'path' => 'images/link-outside.jpg', 'width' => '400' ),
+						'ok'       => array(
+							'path'  => 'images/plain.svg',
+							'width' => '100',
+						),
+						'missing'  => array(
+							'path'  => 'images/missing.jpg',
+							'width' => '200',
+						),
+						'outside'  => array(
+							'path'  => '../../../etc/passwd',
+							'width' => '300',
+						),
+						'external' => array(
+							'path'  => 'images/link-outside.jpg',
+							'width' => '400',
+						),
 					),
 				)
 			)

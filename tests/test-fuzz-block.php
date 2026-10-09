@@ -58,14 +58,44 @@ class Test_Fuzz_Block extends Fuzz_Case {
 				'max_width'  => '40rem',
 				'sizes'      => '(max-width: 800px) 100vw, 800px',
 				'variations' => array(
-					'small'  => array( 'name' => 'Small', 'path' => 'images/photo-400.jpg', 'width' => '400', 'height' => '300' ),
-					'medium' => array( 'name' => 'Medium', 'path' => 'images/photo-800.jpg', 'width' => '800', 'height' => '533' ),
+					'small'  => array(
+						'name'   => 'Small',
+						'path'   => 'images/photo-400.jpg',
+						'width'  => '400',
+						'height' => '300',
+					),
+					'medium' => array(
+						'name'   => 'Medium',
+						'path'   => 'images/photo-800.jpg',
+						'width'  => '800',
+						'height' => '533',
+					),
 				),
 			)
 		);
-		Registry::register( 'logo', array( 'title' => 'Logo', 'alt' => 'Logo <b>alt</b>', 'path' => 'images/logo.svg' ) );
-		StyleRegistry::register( 'hero', array( 'name' => 'Hero', 'width' => 'clamp(10rem, 100vw, 60rem)' ) );
-		StyleRegistry::register( 'thumb', array( 'name' => 'Thumb', 'width' => '150px', 'height' => '150px' ) );
+		Registry::register(
+			'logo',
+			array(
+				'title' => 'Logo',
+				'alt'   => 'Logo <b>alt</b>',
+				'path'  => 'images/logo.svg',
+			)
+		);
+		StyleRegistry::register(
+			'hero',
+			array(
+				'name'  => 'Hero',
+				'width' => 'clamp(10rem, 100vw, 60rem)',
+			)
+		);
+		StyleRegistry::register(
+			'thumb',
+			array(
+				'name'   => 'Thumb',
+				'width'  => '150px',
+				'height' => '150px',
+			)
+		);
 
 		$this->assertTrue(
 			WP_Block_Type_Registry::get_instance()->is_registered( 'happyprime/theme-image' ),
@@ -86,6 +116,8 @@ class Test_Fuzz_Block extends Fuzz_Case {
 
 	/**
 	 * Builds a random string attribute value.
+	 *
+	 * @param string $name Attribute name.
 	 */
 	private function random_string_attr( string $name ): string {
 		switch ( $name ) {
@@ -276,7 +308,10 @@ class Test_Fuzz_Block extends Fuzz_Case {
 		for ( $i = 0; $i < $this->runs; $i++ ) {
 			$attrs = $this->random_attributes( true );
 
-			WP_Block_Supports::$block_to_render = array( 'blockName' => 'happyprime/theme-image', 'attrs' => $attrs );
+			WP_Block_Supports::$block_to_render = array(
+				'blockName' => 'happyprime/theme-image',
+				'attrs'     => $attrs,
+			);
 
 			try {
 				$html = Block::render( $attrs, '' );
@@ -308,7 +343,10 @@ class Test_Fuzz_Block extends Fuzz_Case {
 					$name         => $value,
 				);
 
-				WP_Block_Supports::$block_to_render = array( 'blockName' => 'happyprime/theme-image', 'attrs' => $attrs );
+				WP_Block_Supports::$block_to_render = array(
+					'blockName' => 'happyprime/theme-image',
+					'attrs'     => $attrs,
+				);
 
 				try {
 					$html = Block::render( $attrs, '' );
@@ -329,7 +367,10 @@ class Test_Fuzz_Block extends Fuzz_Case {
 		for ( $i = 0; $i < $this->runs; $i++ ) {
 			$attrs = $this->random_attributes( false );
 
-			WP_Block_Supports::$block_to_render = array( 'blockName' => 'happyprime/theme-image', 'attrs' => $attrs );
+			WP_Block_Supports::$block_to_render = array(
+				'blockName' => 'happyprime/theme-image',
+				'attrs'     => $attrs,
+			);
 
 			try {
 				$html = Block::render( $attrs, '' );

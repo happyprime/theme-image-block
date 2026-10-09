@@ -52,6 +52,8 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 
 	/**
 	 * Whether the tag processor can find a root svg tag in the markup.
+	 *
+	 * @param string $markup Markup to search.
 	 */
 	private static function has_svg_tag( string $markup ): bool {
 		$processor = new WP_HTML_Tag_Processor( $markup );
@@ -143,7 +145,15 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 		$processor->next_tag( array( 'tag_name' => 'svg' ) );
 		$this->assertSame( 'border: 1px solid red', $processor->get_attribute( 'style' ) );
 
-		$processor = new WP_HTML_Tag_Processor( SVG::get( $file, array( 'width' => '10rem', 'max_height' => '5rem' ) ) );
+		$processor = new WP_HTML_Tag_Processor(
+			SVG::get(
+				$file,
+				array(
+					'width'      => '10rem',
+					'max_height' => '5rem',
+				)
+			)
+		);
 		$processor->next_tag( array( 'tag_name' => 'svg' ) );
 		$this->assertSame( 'border: 1px solid red; width: 10rem; max-height: 5rem', $processor->get_attribute( 'style' ) );
 	}
@@ -166,6 +176,8 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 
 	/**
 	 * Mutates a corpus file at random.
+	 *
+	 * @param string $svg SVG markup from the corpus.
 	 */
 	private function mutate( string $svg ): string {
 		$count = mt_rand( 1, 3 );
@@ -233,7 +245,11 @@ class Test_Fuzz_SVG extends Fuzz_Case {
 				'height' => $this->chance( 30 ) ? 'auto' : '',
 			);
 
-			$input = array( 'source' => basename( $source ), 'file' => $file, 'args' => $args );
+			$input = array(
+				'source' => basename( $source ),
+				'file'   => $file,
+				'args'   => $args,
+			);
 
 			try {
 				$output = SVG::get( $file, $args );

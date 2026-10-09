@@ -452,7 +452,7 @@ class Test_Registry extends WP_UnitTestCase {
 	 * Test sanitize_key is applied to slug.
 	 */
 	public function test_slug_is_sanitized(): void {
-		$result = Registry::register(
+		Registry::register(
 			'Test Image!',
 			array(
 				'title' => 'Test Image',

@@ -61,10 +61,24 @@ class Test_Block extends WP_UnitTestCase {
 				'height'     => '1066',
 				'sizes'      => '(max-width: 800px) 100vw, 800px',
 				'variations' => array(
-					'small'   => array( 'path' => 'images/photo-400.jpg', 'width' => '400', 'height' => '300' ),
-					'medium'  => array( 'path' => 'images/photo-800.jpg', 'width' => '800', 'height' => '533' ),
-					'again'   => array( 'path' => 'images/photo-800.jpg', 'width' => '800' ),
-					'rem'     => array( 'path' => 'images/photo-400.jpg', 'width' => '10rem' ),
+					'small'   => array(
+						'path'   => 'images/photo-400.jpg',
+						'width'  => '400',
+						'height' => '300',
+					),
+					'medium'  => array(
+						'path'   => 'images/photo-800.jpg',
+						'width'  => '800',
+						'height' => '533',
+					),
+					'again'   => array(
+						'path'  => 'images/photo-800.jpg',
+						'width' => '800',
+					),
+					'rem'     => array(
+						'path'  => 'images/photo-400.jpg',
+						'width' => '10rem',
+					),
 					'nowidth' => array( 'path' => 'images/photo-400.jpg' ),
 				),
 			)
@@ -78,7 +92,10 @@ class Test_Block extends WP_UnitTestCase {
 				'width'      => '200',
 				'sizes'      => '100vw',
 				'variations' => array(
-					'small' => array( 'path' => 'images/logo.svg', 'width' => '100' ),
+					'small' => array(
+						'path'  => 'images/logo.svg',
+						'width' => '100',
+					),
 				),
 			)
 		);
@@ -171,7 +188,15 @@ class Test_Block extends WP_UnitTestCase {
 	 * Test the selected variation is the src and caps the srcset.
 	 */
 	public function test_srcset_is_capped_at_the_selected_variation(): void {
-		$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo', 'imageSize' => 'medium' ) ), 'img' );
+		$img = $this->tag_attributes(
+			$this->render(
+				array(
+					'themeImage' => 'photo',
+					'imageSize'  => 'medium',
+				)
+			),
+			'img'
+		);
 
 		$this->assertSame( $this->uri . '/images/photo-800.jpg', $img['src'] );
 		$this->assertSame(
@@ -185,7 +210,15 @@ class Test_Block extends WP_UnitTestCase {
 	 */
 	public function test_no_srcset_when_selected_variation_has_no_pixel_width(): void {
 		foreach ( array( 'rem', 'nowidth' ) as $size ) {
-			$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo', 'imageSize' => $size ) ), 'img' );
+			$img = $this->tag_attributes(
+				$this->render(
+					array(
+						'themeImage' => 'photo',
+						'imageSize'  => $size,
+					)
+				),
+				'img'
+			);
 
 			$this->assertSame( $this->uri . '/images/photo-400.jpg', $img['src'], $size );
 			$this->assertArrayNotHasKey( 'srcset', $img, $size );
@@ -218,13 +251,29 @@ class Test_Block extends WP_UnitTestCase {
 	 * Test the registered caption renders when the block has none.
 	 */
 	public function test_registered_caption_is_the_fallback(): void {
-		$html = $this->render( array( 'themeImage' => 'unsized', 'showCaption' => true ) );
+		$html = $this->render(
+			array(
+				'themeImage'  => 'unsized',
+				'showCaption' => true,
+			)
+		);
 		$this->assertStringContainsString( '<figcaption>Registered &amp; plain caption</figcaption>', $html );
 
-		$html = $this->render( array( 'themeImage' => 'unsized', 'showCaption' => true, 'caption' => 'Typed <strong>caption</strong>' ) );
+		$html = $this->render(
+			array(
+				'themeImage'  => 'unsized',
+				'showCaption' => true,
+				'caption'     => 'Typed <strong>caption</strong>',
+			)
+		);
 		$this->assertStringContainsString( '<figcaption>Typed <strong>caption</strong></figcaption>', $html );
 
-		$html = $this->render( array( 'themeImage' => 'unsized', 'caption' => 'Typed' ) );
+		$html = $this->render(
+			array(
+				'themeImage' => 'unsized',
+				'caption'    => 'Typed',
+			)
+		);
 		$this->assertStringNotContainsString( '<figcaption', $html );
 	}
 
@@ -236,12 +285,30 @@ class Test_Block extends WP_UnitTestCase {
 		$this->assertSame( '1600', $img['width'] );
 		$this->assertSame( '1066', $img['height'] );
 
-		$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo', 'imageSize' => 'medium' ) ), 'img' );
+		$img = $this->tag_attributes(
+			$this->render(
+				array(
+					'themeImage' => 'photo',
+					'imageSize'  => 'medium',
+				)
+			),
+			'img'
+		);
 		$this->assertSame( '800', $img['width'] );
 		$this->assertSame( '533', $img['height'] );
 
 		// One dimension alone, or a non-pixel value, emits neither.
-		foreach ( array( array( 'themeImage' => 'photo', 'imageSize' => 'again' ), array( 'themeImage' => 'photo', 'imageSize' => 'rem' ), array( 'themeImage' => 'logo' ) ) as $attrs ) {
+		foreach ( array(
+			array(
+				'themeImage' => 'photo',
+				'imageSize'  => 'again',
+			),
+			array(
+				'themeImage' => 'photo',
+				'imageSize'  => 'rem',
+			),
+			array( 'themeImage' => 'logo' ),
+		) as $attrs ) {
 			$img = $this->tag_attributes( $this->render( $attrs ), 'img' );
 			$this->assertArrayNotHasKey( 'width', $img, wp_json_encode( $attrs ) );
 			$this->assertArrayNotHasKey( 'height', $img, wp_json_encode( $attrs ) );
@@ -252,13 +319,24 @@ class Test_Block extends WP_UnitTestCase {
 	 * Test only browsing context keywords are accepted as the link target.
 	 */
 	public function test_link_target_is_constrained(): void {
-		$base = array( 'themeImage' => 'photo', 'linkUrl' => 'https://example.com/' );
+		$base = array(
+			'themeImage' => 'photo',
+			'linkUrl'    => 'https://example.com/',
+		);
 
 		$a = $this->tag_attributes( $this->render( $base + array( 'linkTarget' => '_top' ) ), 'a' );
 		$this->assertSame( '_top', $a['target'] );
 		$this->assertArrayNotHasKey( 'rel', $a );
 
-		$a = $this->tag_attributes( $this->render( $base + array( 'linkTarget' => 'popup', 'linkRel' => 'nofollow' ) ), 'a' );
+		$a = $this->tag_attributes(
+			$this->render(
+				$base + array(
+					'linkTarget' => 'popup',
+					'linkRel'    => 'nofollow',
+				)
+			),
+			'a'
+		);
 		$this->assertArrayNotHasKey( 'target', $a );
 		$this->assertSame( 'nofollow', $a['rel'] );
 	}
@@ -267,7 +345,11 @@ class Test_Block extends WP_UnitTestCase {
 	 * Test a _blank target always carries noopener.
 	 */
 	public function test_blank_target_forces_noopener(): void {
-		$base = array( 'themeImage' => 'photo', 'linkUrl' => 'https://example.com/', 'linkTarget' => '_blank' );
+		$base = array(
+			'themeImage' => 'photo',
+			'linkUrl'    => 'https://example.com/',
+			'linkTarget' => '_blank',
+		);
 
 		$a = $this->tag_attributes( $this->render( $base ), 'a' );
 		$this->assertSame( 'noopener', $a['rel'] );
@@ -283,9 +365,23 @@ class Test_Block extends WP_UnitTestCase {
 	 * Test a style value of 0 is emitted.
 	 */
 	public function test_zero_style_value_is_emitted(): void {
-		StyleRegistry::register( 'flat', array( 'name' => 'Flat', 'height' => '0' ) );
+		StyleRegistry::register(
+			'flat',
+			array(
+				'name'   => 'Flat',
+				'height' => '0',
+			)
+		);
 
-		$img = $this->tag_attributes( $this->render( array( 'themeImage' => 'photo', 'imageStyle' => 'flat' ) ), 'img' );
+		$img = $this->tag_attributes(
+			$this->render(
+				array(
+					'themeImage' => 'photo',
+					'imageStyle' => 'flat',
+				)
+			),
+			'img'
+		);
 
 		$this->assertSame( 'height: 0', $img['style'] );
 	}
@@ -296,10 +392,30 @@ class Test_Block extends WP_UnitTestCase {
 	public function test_inline_svg_foreign_object_img_is_untouched(): void {
 		copy( __DIR__ . '/fixtures/svg/svg-nested.svg', $this->theme . '/images/nested.svg' );
 		file_put_contents( $this->theme . '/images/nested.svg', str_replace( '<div xmlns="http://www.w3.org/1999/xhtml">hi</div>', '<img src="x.png" alt="">', file_get_contents( $this->theme . '/images/nested.svg' ) ) );
-		Registry::register( 'nested', array( 'title' => 'Nested', 'path' => 'images/nested.svg', 'width' => '200', 'sizes' => '100vw' ) );
-		StyleRegistry::register( 'thumb', array( 'name' => 'Thumb', 'width' => '150px' ) );
+		Registry::register(
+			'nested',
+			array(
+				'title' => 'Nested',
+				'path'  => 'images/nested.svg',
+				'width' => '200',
+				'sizes' => '100vw',
+			)
+		);
+		StyleRegistry::register(
+			'thumb',
+			array(
+				'name'  => 'Thumb',
+				'width' => '150px',
+			)
+		);
 
-		$html = $this->render( array( 'themeImage' => 'nested', 'inlineSVG' => true, 'imageStyle' => 'thumb' ) );
+		$html = $this->render(
+			array(
+				'themeImage' => 'nested',
+				'inlineSVG'  => true,
+				'imageStyle' => 'thumb',
+			)
+		);
 
 		$this->assertStringContainsString( '<img src="x.png" alt="">', $html );
 		$this->assertStringContainsString( 'style="width: 150px"', $html );
