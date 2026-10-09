@@ -3,8 +3,6 @@
  *
  * @see https://playwright.dev/docs/test-configuration
  */
-import os from 'node:os';
-
 import { defineConfig, devices } from '@playwright/test';
 
 // @wordpress/e2e-test-utils-playwright reads process.env.WP_BASE_URL (default
@@ -22,8 +20,9 @@ export default defineConfig( {
 	fullyParallel: true,
 	forbidOnly: !! process.env.CI,
 	retries: process.env.CI ? 2 : 0,
-	// Contention on the single WordPress container, not CPU, is the limit.
-	workers: Math.min( 4, os.cpus().length ),
+	// One admin user on one container: parallel workers race on editor
+	// preferences and popovers, and the link control spec fails at random.
+	workers: 1,
 	reporter: [
 		[ 'list' ],
 		[ 'html', { outputFolder: './tests/e2e/playwright-report', open: 'never' } ],
