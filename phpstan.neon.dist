@@ -1,8 +1,14 @@
 includes:
-  - %rootDir%/../../happyprime/coding-standards/phpstan.neon.dist
+  - vendor/happyprime/coding-standards/phpstan.neon.dist
 
 parameters:
   level: 9
   treatPhpDocTypesAsCertain: false
+  paths:
+    - theme-image-block.php
+    - src
   excludePaths:
+    - blocks/build/*
+    - node_modules/*
     - tests/*
+    - vendor/*
