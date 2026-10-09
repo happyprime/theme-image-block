@@ -28,3 +28,5 @@ phpunit.xml.dist
 playwright.config.ts
 README.md
 webpack.config.js
+.npmpackagejsonlintrc.json
+.stylelintrc.json
