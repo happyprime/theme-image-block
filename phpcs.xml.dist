@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<ruleset name="Theme Image Block">
+	<rule ref="HappyPrime"/>
+	<file>.</file>
+
+	<exclude-pattern>blocks/build/*</exclude-pattern>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="theme-image-block"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="HappyPrime\ThemeImageBlock"/>
+				<element value="happyprime_themeimageblock"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Tests build fixture files on disk and seed mt_rand() so a fuzz run replays. -->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Security.EscapeOutput.ExceptionNotEscaped">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+</ruleset>
