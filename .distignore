@@ -30,3 +30,5 @@ README.md
 webpack.config.js
 .npmpackagejsonlintrc.json
 .stylelintrc.json
+.dev/
+.wp-env.override.json

@@ -97,39 +97,52 @@ Inline SVG output is the theme file as shipped, with accessibility and sizing at
 
 ## Development
 
-`npm run env:start` brings up WordPress 7.1 on http://localhost:8892 with the
-plugin active (wp-env, Docker). The dev site also mounts the e2e fixture theme
-from `tests/e2e/fixtures/theme/`; `npm run env:cli -- wp ...` runs wp-cli
-inside it.
+```
+npm install
+composer install
+npm run env:start
+```
+
+`env:start` brings up WordPress 7.1 (PHP 8.4) at http://localhost:8970 with the plugin active. Log in at `/wp-admin` as `admin` / `password`.
+
+The seed (`.dev/seed.php`, rerun with `npm run env:seed`) activates Twenty Twenty-Five, sets pretty permalinks, and makes a "Theme Image Block demo" page the front page. It shows variations and `srcset`, a style, inline SVG, omitted alt text, a link, both caption sources, and block supports. The images come from `.dev/mu-plugins/theme-image-block-demo.php`, which registers two Twenty Twenty-Five files plus the e2e fixture images that `.wp-env.json` mounts at `twentytwentyfive/theme-image-block-demo/`.
+
+`npm run env:cli -- wp ...` runs WP-CLI in the site. `npm run env:stop` stops it.
+
+### Checks
+
+```
+composer phpcs
+composer phpstan
+npm run lint:js
+npm run lint:css
+npm run lint:package
+npm run build           # blocks/build is committed; rebuild after editing blocks/src
+```
 
 ### End-to-end tests
 
 ```
+npx playwright install chromium
 npm run test:e2e        # headless; starts wp-env if it is down, stops it after
 npm run test:e2e:ui     # Playwright UI mode against a running env
 ```
 
-Global setup activates the `theme-image-block-e2e` theme, which registers the
-images and styles the specs assert against. `test.fixme()` marks cases that
-fail on a known plugin bug; the reason names the finding.
+Global setup activates the `theme-image-block-e2e` theme, which registers the images and styles the specs assert against. `npm run env:seed` switches the site back to Twenty Twenty-Five.
 
 ### PHPUnit
 
 ```
-npm run test:php        # unit and fuzz tests in the tests env (port 8894)
+npm run env:test:start
+npm run test:php        # unit and fuzz tests in the tests env (port 8971)
 npm run test:php:fuzz   # fuzz tests only
 ```
 
-The fuzz tests seed `mt_rand()` from `TIB_FUZZ_SEED` (default `12345`) and
-run `TIB_FUZZ_RUNS` iterations (default `300`). A failure prints both plus
-the generated input; replay it with
+The fuzz tests seed `mt_rand()` from `TIB_FUZZ_SEED` (default `12345`) and run `TIB_FUZZ_RUNS` iterations (default `300`). A failure prints both plus the generated input; replay it with
 
 ```
 TIB_FUZZ_SEED=777 TIB_FUZZ_RUNS=1000 npm run test:php:fuzz
 ```
-
-Tests that hit a known bug end in `markTestIncomplete()` with the finding, so
-the suite stays green until the fix flips them.
 
 ## Changelog
 

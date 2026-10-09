@@ -1,14 +1,15 @@
 {
-	"core": "https://wordpress.org/wordpress-7.1.zip",
-	"phpVersion": "8.3",
-	"port": 8892,
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
+	"core": "WordPress/WordPress#7.1-branch",
+	"phpVersion": "8.4",
+	"port": 8970,
 	"testsEnvironment": false,
-	"plugins": [
-		"."
-	],
-	"themes": [
-		"./tests/e2e/fixtures/theme/theme-image-block-e2e"
-	],
+	"plugins": [ "." ],
+	"themes": [ "./tests/e2e/fixtures/theme/theme-image-block-e2e" ],
+	"mappings": {
+		"wp-content/mu-plugins": "./.dev/mu-plugins",
+		"wp-content/themes/twentytwentyfive/theme-image-block-demo": "./tests/e2e/fixtures/theme/theme-image-block-e2e/images"
+	},
 	"config": {
 		"WP_DEBUG": true,
 		"WP_DEBUG_LOG": true,

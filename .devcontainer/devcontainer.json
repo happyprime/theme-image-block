@@ -5,9 +5,9 @@
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
 	"postCreateCommand": "npm install",
-	"forwardPorts": [8888],
+	"forwardPorts": [8970],
 	"portsAttributes": {
-		"8888": {
+		"8970": {
 			"label": "WordPress",
 			"onAutoForward": "notify"
 		}
