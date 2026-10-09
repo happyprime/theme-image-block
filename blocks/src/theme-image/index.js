@@ -101,15 +101,16 @@ function Edit({ attributes, setAttributes }) {
 		imagePath = currentImage.variations[imageSize].path;
 	}
 
+	// Encodes each segment so file names with %, # or ? still resolve.
+	const imageUrl =
+		imagePath && themeUrl
+			? `${themeUrl}/${imagePath.split('/').map(encodeURIComponent).join('/')}`
+			: '';
+
 	// Fetch SVG content when inline SVG is enabled.
 	useEffect(() => {
-		if (
-			inlineSVG &&
-			imagePath &&
-			imagePath.toLowerCase().endsWith('.svg')
-		) {
-			const svgUrl = `${themeUrl}/${imagePath}`;
-			fetch(svgUrl)
+		if (inlineSVG && imageUrl && imagePath.toLowerCase().endsWith('.svg')) {
+			fetch(imageUrl)
 				.then((response) => response.text())
 				.then((svg) => {
 					setSvgContent(svg);
@@ -121,14 +122,13 @@ function Edit({ attributes, setAttributes }) {
 		} else {
 			setSvgContent(null);
 		}
-	}, [inlineSVG, imagePath, themeUrl]);
+	}, [inlineSVG, imagePath, imageUrl]);
 
 	const blockProps = useBlockProps({
 		ref: blockRef,
 		className: inlineSVG ? 'has-inline-svg' : '',
 	});
 
-	const imageUrl = imagePath && themeUrl ? `${themeUrl}/${imagePath}` : '';
 	const isSVG = imagePath && imagePath.toLowerCase().endsWith('.svg');
 
 	// Get the selected style's dimensions.
