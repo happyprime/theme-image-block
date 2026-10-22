@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+<title id="title">Theme Image Block</title>
+<desc id="desc">A white geometric icon on a circular color badge.</desc>
+<defs>
+  <linearGradient id="badge-theme-image-block" x1="100%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#21A67A"/>
+    <stop offset="28%" stop-color="#1E8E99"/>
+    <stop offset="100%" stop-color="#005A66"/>
+  </linearGradient>
+<mask id="notch-theme-image-block"><rect width="256" height="256" fill="#fff"/><polygon points="201.2,58.4 359.1,32.3 370.6,-111.6 226.7,-99.5" fill="#000" stroke="#000" stroke-width="6.6" stroke-linejoin="round"/></mask>
+</defs>
+<circle cx="128" cy="128" r="118" fill="url(#badge-theme-image-block)" mask="url(#notch-theme-image-block)"/>
+
+  <g class="glyph" transform="translate(128 128) scale(0.85) translate(-128 -128)">
+<!-- An image set inside a portrait-oriented theme/layout page, rather than a generic gallery tile. -->
+  <rect x="73" y="53" width="110" height="151" rx="15" fill="none" stroke="#fff" stroke-width="11"/>
+  <path d="M92 77h72" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <rect x="90" y="100" width="76" height="73" rx="7" fill="none" stroke="#fff" stroke-width="7"/>
+  <circle cx="144" cy="120" r="7" fill="#fff"/>
+  <path d="m94 157 20-24 18 19 9-9 21 22H94Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M92 187h47" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>
