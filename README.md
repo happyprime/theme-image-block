@@ -138,6 +138,8 @@ npm run test:php        # unit and fuzz tests in the tests env (port 8971)
 npm run test:php:fuzz   # fuzz tests only
 ```
 
+PHPUnit runs in Docker against the latest WordPress release, as CI does. CI installs its own test library on the runner. The test site answers as `example.org`, as CI's does: under wp-env's default `localhost`, `wp_mail()` refuses its own From address.
+
 The fuzz tests seed `mt_rand()` from `TIB_FUZZ_SEED` (default `12345`) and run `TIB_FUZZ_RUNS` iterations (default `300`). A failure prints both plus the generated input; replay it with
 
 ```
