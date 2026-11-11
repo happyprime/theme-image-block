@@ -1,0 +1,8 @@
+/**
+ * Default styles for the theme image block.
+ */
+.wp-block-happyprime-theme-image img,
+.wp-block-happyprime-theme-image svg {
+	max-width: 100%;
+	height: auto;
+}
