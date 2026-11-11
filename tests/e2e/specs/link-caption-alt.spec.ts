@@ -311,6 +311,10 @@ test.describe( 'Link, caption and alt text', () => {
 		page,
 		requestUtils,
 	} ) => {
+		// Two editor loads and a front end visit outrun the default 30s with
+		// SCRIPT_DEBUG on. Going back to the editor loads it twice.
+		test.slow();
+
 		let postId: number | undefined;
 
 		try {
