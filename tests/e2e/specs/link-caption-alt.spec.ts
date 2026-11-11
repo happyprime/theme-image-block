@@ -217,6 +217,11 @@ test.describe( 'Link, caption and alt text', () => {
 
 		try {
 			await admin.createNewPost( { title: 'Link control' } );
+			// Core saves the Advanced drawer's open state for the user, so a
+			// passing run leaves it open and the click below closes it.
+			await editor.setPreferences( 'core/block-editor', {
+				linkControlSettingsDrawer: false,
+			} );
 			await editor.insertBlock( {
 				name: 'happyprime/theme-image',
 				attributes: { themeImage: 'alpha' },
